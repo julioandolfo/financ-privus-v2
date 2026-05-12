@@ -1,58 +1,124 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Financ Privus v2
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistema Financeiro Empresarial — Laravel 13 + Livewire 3 + Tailwind CSS v4
 
-## About Laravel
+## Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **PHP 8.4** + **Laravel 13**
+- **Livewire 3** + **Volt** (componentes reativos)
+- **Tailwind CSS v4** via Vite (build local, sem CDN)
+- **Alpine.js** (interatividade leve)
+- **MySQL 8.4** + **Redis 7**
+- **Spatie**: Permission, ActivityLog, Backup
+- **Laravel Sanctum** (API tokens)
+- **Laravel Telescope** (debug em desenvolvimento)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Deploy no Coolify (automático)
 
-## Learning Laravel
+O `docker-compose.yml` está configurado para subir **tudo junto** (app + MySQL + Redis) em um único deploy.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Passo a passo
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+1. No Coolify: **New Resource → Docker Compose**
+2. Informe a URL do repositório GitHub
+3. Branch: `main`
+4. Coolify detecta o `docker-compose.yml` e exibe todas as variáveis automaticamente
+5. Preencha as variáveis obrigatórias (veja abaixo)
+6. Clique em **Deploy**
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### Variáveis obrigatórias no Coolify
 
-## Agentic Development
+| Variável | Descrição |
+|---|---|
+| `APP_KEY` | Gere com `php artisan key:generate --show` |
+| `APP_URL` | URL do seu domínio (ex: `https://financeiro.seusite.com`) |
+| `DB_PASSWORD` | Senha do banco MySQL |
+| `DB_ROOT_PASSWORD` | Senha root do MySQL |
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+> As demais variáveis têm valores padrão e podem ser configuradas depois.
+
+### Variáveis opcionais (integrações)
+
+| Variável | Serviço |
+|---|---|
+| `OPENAI_API_KEY` | Dashboard com insights de IA |
+| `EVOLUTION_API_URL` / `EVOLUTION_API_KEY` | WhatsApp |
+| `MERCADOPAGO_ACCESS_TOKEN` | MercadoPago |
+| `BANCO_ITAU_CLIENT_ID` / `SECRET` | Itaú Open Finance |
+| `BANCO_BRADESCO_TOKEN` | Bradesco |
+| `SICOOB_CLIENT_ID` / `SECRET` | Sicoob |
+| `WOOCOMMERCE_URL` / `KEY` / `SECRET` | WooCommerce |
+
+---
+
+## Desenvolvimento local
 
 ```bash
-composer require laravel/boost --dev
+# 1. Clonar
+git clone https://github.com/julioandolfo/financ-privus-v2.git
+cd financ-privus-v2
 
-php artisan boost:install
+# 2. Dependências
+composer install
+npm install
+
+# 3. Configurar ambiente
+cp .env.example .env
+php artisan key:generate
+
+# 4. Banco de dados (ajustar .env com suas credenciais)
+php artisan migrate
+
+# 5. Iniciar servidores
+php artisan serve &
+npm run dev
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### Com Docker local
 
-## Contributing
+```bash
+cp .env.example .env
+# Edite .env: defina APP_KEY, DB_PASSWORD, DB_ROOT_PASSWORD
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+docker compose up -d
+```
 
-## Code of Conduct
+Acesse: `http://localhost`
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## Estrutura
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```
+app/
+├── Http/Controllers/     # Resource controllers
+│   └── Auth/             # Login, logout
+├── Livewire/             # Componentes Livewire por módulo
+├── Models/               # Eloquent Models
+├── Jobs/                 # Queue jobs (ex-cron scripts)
+└── Services/             # Lógica de negócio
 
-## License
+resources/views/
+├── components/
+│   ├── layouts/          # sidebar, topbar, nav-item
+│   └── ui/               # button, input, card, badge, stat-card
+├── layouts/              # app.blade.php, guest.blade.php
+├── auth/                 # login
+└── dashboard/            # index
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+docker/
+├── nginx/default.conf
+├── php/php.ini, opcache.ini, php-fpm.conf
+├── supervisor/supervisord.conf
+└── entrypoint.sh
+```
+
+## O que o container roda automaticamente
+
+- **PHP-FPM** (processa o Laravel)
+- **Nginx** (serve a aplicação)
+- **Queue Worker** (2 processos, retry automático)
+- **Scheduler** (equivalente ao cron, roda a cada 60s)
+- **Migrations** (executa `php artisan migrate` no startup)
