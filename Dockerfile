@@ -63,7 +63,11 @@ RUN apk add --no-cache \
         bcmath \
         intl \
         opcache \
-        pcntl
+        pcntl \
+    && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && apk del .build-deps
 
 WORKDIR /var/www/html
 
