@@ -45,6 +45,8 @@ class MigrateLegado extends Command
             'despesas_recorrentes'  => fn() => $this->migrarDespesasRecorrentes(),
             'receitas_recorrentes'  => fn() => $this->migrarReceitasRecorrentes(),
             'movimentacoes_caixa'   => fn() => $this->migrarMovimentacoesCaixa(),
+            'categorias_produto'    => fn() => $this->migrarCategoriasProduto(),
+            'produtos'              => fn() => $this->migrarProdutos(),
         ];
 
         $only = $this->option('only');
@@ -549,8 +551,10 @@ class MigrateLegado extends Command
             'usuarios'         => 'users',
             'formas_pagamento' => 'formas_pagamento',
             'centros_custo'    => 'centros_custo',
-            'categorias'       => 'categorias_financeiras',
-            'empresas'         => 'empresas',
+            'categorias'          => 'categorias_financeiras',
+            'empresas'            => 'empresas',
+            'produtos'            => 'produtos',
+            'categorias_produto'  => 'categorias_produto',
         ];
         foreach ($etapas as $etapa) {
             if (isset($mapa[$etapa])) {
@@ -754,6 +758,96 @@ class MigrateLegado extends Command
         });
 
         $this->line("  ✓ {$count} movimentações de caixa migradas.");
+    }
+
+    // -------------------------------------------------------------------------
+    // CATEGORIAS DE PRODUTO
+    // -------------------------------------------------------------------------
+    private function migrarCategoriasProduto(): void
+    {
+        $tabela = collect(['categorias_produto', 'categorias_produtos', 'product_categories'])
+            ->first(fn($t) => $this->legado->getSchemaBuilder()->hasTable($t));
+
+        if (! $tabela) {
+            $this->line('  – categorias_produto: tabela não encontrada no legado, pulando.');
+            return;
+        }
+
+        $count = 0;
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+
+        $this->legado->table($tabela)->orderBy('id')->chunk(500, function ($rows) use (&$count) {
+            $insert = $rows->map(fn($r) => [
+                'id'         => $r->id,
+                'empresa_id' => $r->empresa_id,
+                'nome'       => $r->nome,
+                'ativo'      => $r->ativo ?? true,
+                'created_at' => $r->created_at ?? now(),
+                'updated_at' => $r->updated_at ?? now(),
+            ])->toArray();
+
+            DB::table('categorias_produto')->upsert($insert, ['id'], array_keys($insert[0] ?? []));
+            $count += count($insert);
+        });
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        $this->line("  ✓ {$count} categorias de produto (de '{$tabela}')");
+    }
+
+    // -------------------------------------------------------------------------
+    // PRODUTOS
+    // -------------------------------------------------------------------------
+    private function migrarProdutos(): void
+    {
+        $tabela = collect(['produtos', 'products', 'itens', 'produtos_servicos'])
+            ->first(fn($t) => $this->legado->getSchemaBuilder()->hasTable($t));
+
+        if (! $tabela) {
+            $this->line('  – produtos: tabela não encontrada no legado, pulando.');
+            return;
+        }
+
+        $count = 0;
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+
+        $this->legado->table($tabela)->orderBy('id')->chunk(500, function ($rows) use (&$count) {
+            $insert = $rows->map(fn($r) => [
+                'id'             => $r->id,
+                'empresa_id'     => $r->empresa_id,
+                'user_id'        => $r->usuario_cadastro_id ?? $r->user_id ?? 1,
+                'categoria_id'   => $r->categoria_id ?? null,
+                'codigo'         => $r->codigo ?? null,
+                'sku'            => $r->sku ?? null,
+                'codigo_barras'  => $r->codigo_barras ?? $r->ean ?? null,
+                'nome'           => $r->nome,
+                'descricao'      => $r->descricao ?? null,
+                'custo_unitario' => $r->custo_unitario ?? $r->preco_custo ?? 0,
+                'preco_venda'    => $r->preco_venda ?? $r->preco ?? 0,
+                'unidade_medida' => $r->unidade_medida ?? $r->unidade ?? 'UN',
+                'estoque'        => $r->estoque ?? $r->quantidade_estoque ?? 0,
+                'estoque_minimo' => $r->estoque_minimo ?? $r->quantidade_minima ?? 0,
+                'ncm'            => $r->ncm ?? null,
+                'cest'           => $r->cest ?? null,
+                'cfop'           => $r->cfop ?? null,
+                'aliquota_icms'  => $r->aliquota_icms ?? null,
+                'aliquota_ipi'   => $r->aliquota_ipi ?? null,
+                'aliquota_pis'   => $r->aliquota_pis ?? null,
+                'aliquota_cofins'=> $r->aliquota_cofins ?? null,
+                'origem_fiscal'  => $r->origem_fiscal ?? null,
+                'tipo'           => in_array($r->tipo ?? 'produto', ['produto', 'servico']) ? $r->tipo : 'produto',
+                'woo_id'         => $r->woo_id ?? null,
+                'ativo'          => $r->ativo ?? true,
+                'created_at'     => $r->created_at ?? $r->data_cadastro ?? now(),
+                'updated_at'     => $r->updated_at ?? $r->data_cadastro ?? now(),
+                'deleted_at'     => $r->deleted_at ?? null,
+            ])->toArray();
+
+            DB::table('produtos')->upsert($insert, ['id'], array_keys($insert[0] ?? []));
+            $count += count($insert);
+        });
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        $this->line("  ✓ {$count} produtos (de '{$tabela}')");
     }
 
     private function isJson(string $str): bool

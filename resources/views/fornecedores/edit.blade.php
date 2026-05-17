@@ -20,7 +20,28 @@
         </div>
         @endif
 
-        <form method="POST" action="{{ route('fornecedores.update', $fornecedor) }}">
+        <form method="POST" action="{{ route('fornecedores.update', $fornecedor) }}"
+              x-data="{
+                  buscando: false,
+                  async buscarCnpj(valor) {
+                      const cnpj = valor.replace(/\D/g, '');
+                      if (cnpj.length !== 14) return;
+                      this.buscando = true;
+                      try {
+                          const r = await fetch(`/api/cnpj/${cnpj}`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                          if (!r.ok) return;
+                          const d = await r.json();
+                          if (d.error) return;
+                          if (d.razao_social) $refs.nomeRazaoSocial.value = d.razao_social;
+                          if (d.nome_fantasia) $refs.nomeFantasia.value = d.nome_fantasia;
+                          if (d.email) $refs.emailField.value = d.email;
+                          if (d.telefone) $refs.telefone.value = d.telefone;
+                      } catch (e) {
+                      } finally {
+                          this.buscando = false;
+                      }
+                  }
+              }">
             @csrf @method('PUT')
 
             <x-ui.card class="mb-4">
@@ -43,10 +64,27 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="sm:col-span-2">
                         <x-ui.input name="nome_razao_social" label="Nome / Razão Social" required
+                            x-ref="nomeRazaoSocial"
                             value="{{ old('nome_razao_social', $fornecedor->nome_razao_social) }}" :error="$errors->first('nome_razao_social')" />
                     </div>
-                    <x-ui.input name="nome_fantasia" label="Nome Fantasia" value="{{ old('nome_fantasia', $fornecedor->nome_fantasia) }}" hint="Opcional" />
-                    <x-ui.input name="cpf_cnpj" label="CPF / CNPJ" value="{{ old('cpf_cnpj', $fornecedor->cpf_cnpj) }}" />
+                    <x-ui.input name="nome_fantasia" label="Nome Fantasia" x-ref="nomeFantasia" value="{{ old('nome_fantasia', $fornecedor->nome_fantasia) }}" hint="Opcional" />
+                    <div>
+                        <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1.5">CPF / CNPJ</label>
+                        <div class="relative">
+                            <input type="text" name="cpf_cnpj"
+                                value="{{ old('cpf_cnpj', $fornecedor->cpf_cnpj) }}"
+                                placeholder="00.000.000/0000-00"
+                                @blur="buscarCnpj($event.target.value)"
+                                class="block w-full rounded-xl border-0 py-2.5 px-3.5 pr-10 text-sm bg-white dark:bg-surface-800 text-surface-900 dark:text-white ring-1 ring-inset ring-surface-200 dark:ring-surface-700 placeholder:text-surface-400 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-shadow">
+                            <div x-show="buscando" class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                <svg class="animate-spin w-4 h-4 text-primary-500" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <p class="mt-1.5 text-xs text-surface-500">Preenche dados automaticamente para CNPJ</p>
+                    </div>
                 </div>
             </x-ui.card>
 
@@ -54,9 +92,9 @@
                 <h2 class="text-sm font-semibold text-surface-700 dark:text-surface-300 mb-4">Contato</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="sm:col-span-2">
-                        <x-ui.input name="email" type="email" label="E-mail" value="{{ old('email', $fornecedor->email) }}" :error="$errors->first('email')" />
+                        <x-ui.input name="email" type="email" label="E-mail" x-ref="emailField" value="{{ old('email', $fornecedor->email) }}" :error="$errors->first('email')" />
                     </div>
-                    <x-ui.input name="telefone" label="Telefone" value="{{ old('telefone', $fornecedor->telefone) }}" />
+                    <x-ui.input name="telefone" label="Telefone" x-ref="telefone" value="{{ old('telefone', $fornecedor->telefone) }}" />
                     <x-ui.input name="celular" label="Celular" value="{{ old('celular', $fornecedor->celular) }}" />
                 </div>
             </x-ui.card>

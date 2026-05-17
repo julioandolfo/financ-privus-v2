@@ -23,6 +23,7 @@ use App\Http\Controllers\FluxoCaixaController;
 use App\Http\Controllers\MovimentacaoCaixaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProdutoController;
+use App\Http\Controllers\PontoEquilibrioController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn() => redirect()->route('dashboard'));
@@ -77,6 +78,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/relatorios/fluxo-caixa', [FluxoCaixaController::class, 'index'])->name('relatorios.fluxo-caixa');
     Route::get('/relatorios/dre', [DreController::class, 'index'])->name('relatorios.dre');
+    Route::get('/relatorios/ponto-equilibrio', [PontoEquilibrioController::class, 'index'])->name('relatorios.ponto-equilibrio');
 
     Route::resource('despesas-recorrentes', DespesaRecorrenteController::class)->names('despesas-recorrentes')->except(['show']);
     Route::post('despesas-recorrentes/{despesasRecorrente}/toggle', [DespesaRecorrenteController::class, 'toggle'])->name('despesas-recorrentes.toggle');
