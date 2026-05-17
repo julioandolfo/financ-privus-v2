@@ -15,6 +15,7 @@ use App\Http\Controllers\ConciliacaoController;
 use App\Http\Controllers\DespesaRecorrenteController;
 use App\Http\Controllers\ReceitaRecorrenteController;
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\IntegracaoController;
 use App\Http\Controllers\ConfiguracaoController;
 use App\Http\Controllers\DreController;
 use App\Http\Controllers\UsuarioController;
@@ -62,6 +63,11 @@ Route::middleware('auth')->group(function () {
     Route::resource('usuarios', UsuarioController::class)->names('usuarios')->except(['show']);
 
     Route::get('/api/cnpj/{cnpj}', [ApiController::class, 'buscarCnpj'])->name('api.cnpj');
+
+    Route::get('/integracoes', [IntegracaoController::class, 'index'])->name('integracoes.index');
+    Route::get('/integracoes/{tipo}', [IntegracaoController::class, 'configurar'])->name('integracoes.configurar');
+    Route::put('/integracoes/{tipo}', [IntegracaoController::class, 'salvar'])->name('integracoes.salvar');
+    Route::post('/integracoes/{tipo}/testar', [IntegracaoController::class, 'testar'])->name('integracoes.testar');
 
     Route::get('/configuracoes', [ConfiguracaoController::class, 'index'])->name('configuracoes.index');
     Route::put('/configuracoes', [ConfiguracaoController::class, 'update'])->name('configuracoes.update');
