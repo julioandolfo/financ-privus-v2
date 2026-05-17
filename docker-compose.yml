@@ -32,7 +32,7 @@ services:
       DB_PORT: 3306
       DB_DATABASE: ${DB_DATABASE:-financeiro}
       DB_USERNAME: ${DB_USERNAME:-financeiro}
-      DB_PASSWORD: ${DB_PASSWORD:-}
+      DB_PASSWORD: ${DB_PASSWORD:-secret}
 
       # Cache / Session / Queue — usa Redis deste compose
       CACHE_STORE: redis
@@ -100,16 +100,16 @@ services:
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-financeiro}
       MYSQL_USER: ${DB_USERNAME:-financeiro}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-}
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootsecret}
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 --silent"]
       interval: 10s
       timeout: 5s
-      retries: 10
-      start_period: 30s
+      retries: 15
+      start_period: 60s
     restart: unless-stopped
 
   # ─── Redis 7 ────────────────────────────────────────────────────────────────
