@@ -22,6 +22,7 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\FluxoCaixaController;
 use App\Http\Controllers\MovimentacaoCaixaController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProdutoController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn() => redirect()->route('dashboard'));
@@ -61,6 +62,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('formas-pagamento', FormaPagamentoController::class)->names('formas-pagamento')->except(['show']);
 
     Route::resource('usuarios', UsuarioController::class)->names('usuarios')->except(['show']);
+
+    Route::resource('produtos', ProdutoController::class)->names('produtos')->except(['show']);
 
     Route::get('/api/cnpj/{cnpj}', [ApiController::class, 'buscarCnpj'])->name('api.cnpj');
 
