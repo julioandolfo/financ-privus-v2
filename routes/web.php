@@ -25,6 +25,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\PontoEquilibrioController;
 use App\Http\Controllers\ExtratoBancarioController;
+use App\Http\Controllers\MigracaoLegadoController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn() => redirect()->route('dashboard'));
@@ -76,6 +77,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/configuracoes', [ConfiguracaoController::class, 'index'])->name('configuracoes.index');
     Route::put('/configuracoes', [ConfiguracaoController::class, 'update'])->name('configuracoes.update');
+
+    Route::get('/migracao', [MigracaoLegadoController::class, 'index'])->name('migracao.index');
+    Route::post('/migracao/testar', [MigracaoLegadoController::class, 'testar'])->name('migracao.testar');
+    Route::post('/migracao/passo', [MigracaoLegadoController::class, 'executarPasso'])->name('migracao.passo');
 
     Route::get('/relatorios/fluxo-caixa', [FluxoCaixaController::class, 'index'])->name('relatorios.fluxo-caixa');
     Route::get('/relatorios/dre', [DreController::class, 'index'])->name('relatorios.dre');
