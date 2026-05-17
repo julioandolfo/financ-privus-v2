@@ -1,12 +1,13 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\EmpresaController;
-use App\Http\Controllers\ClienteController;
-use App\Http\Controllers\FornecedorController;
+use App\Http\Controllers\ContaBancariaController;
 use App\Http\Controllers\ContasPagarController;
 use App\Http\Controllers\ContasReceberController;
+use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EmpresaController;
+use App\Http\Controllers\FornecedorController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,4 +37,6 @@ Route::middleware('auth')->group(function () {
     Route::resource('contas-receber', ContasReceberController::class)->names('contas-receber');
     Route::post('contas-receber/{contaReceber}/baixar', [ContasReceberController::class, 'baixar'])->name('contas-receber.baixar');
     Route::post('contas-receber/baixa-massa', [ContasReceberController::class, 'baixaMassa'])->name('contas-receber.baixa-massa');
+
+    Route::resource('contas-bancarias', ContaBancariaController::class)->names('contas-bancarias')->except(['show']);
 });

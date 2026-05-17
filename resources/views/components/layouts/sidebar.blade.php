@@ -36,6 +36,11 @@
             Contas a Receber
         </x-layouts.nav-item>
 
+        <x-layouts.nav-item href="{{ route('contas-bancarias.index') }}" :active="request()->routeIs('contas-bancarias.*')">
+            <x-slot:icon><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z" /></svg></x-slot:icon>
+            Contas Bancárias
+        </x-layouts.nav-item>
+
         <x-layouts.nav-item href="#" :active="false">
             <x-slot:icon><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /></svg></x-slot:icon>
             Conciliação Bancária
