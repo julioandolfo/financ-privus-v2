@@ -78,6 +78,8 @@ services:
       WOOCOMMERCE_KEY: ${WOOCOMMERCE_KEY:-}
       WOOCOMMERCE_SECRET: ${WOOCOMMERCE_SECRET:-}
 
+    expose:
+      - "80"
     volumes:
       - storage_app:/var/www/html/storage/app
       - storage_logs:/var/www/html/storage/logs
