@@ -48,4 +48,8 @@ migrate_out=$(php artisan migrate --force --no-interaction 2>&1) || {
 }
 printf '%s\n' "$migrate_out"
 
+echo "=== BUILD ASSETS ==="
+ls /var/www/html/public/build/assets/ 2>/dev/null || echo "ERRO: public/build/assets nao encontrado!"
+echo "====================="
+
 exec "$@"
