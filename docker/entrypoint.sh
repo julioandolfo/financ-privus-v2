@@ -22,7 +22,7 @@ if [ "$APP_ENV" = "production" ]; then
     php artisan event:cache   || true
 fi
 
-# Aguarda o DB estar pronto (apenas conectividade, sem rodar migrations)
+# Aguarda o DB estar pronto
 attempt=0
 until php artisan db:show --json > /dev/null 2>&1; do
     attempt=$((attempt + 1))
@@ -34,7 +34,16 @@ until php artisan db:show --json > /dev/null 2>&1; do
     sleep 3
 done
 
-# Roda migrations uma unica vez — falha real aborta o container
-php artisan migrate --force --no-interaction
+# Roda migrations — "table already exists" é inofensivo num restart, outros erros abortam
+migrate_out=$(php artisan migrate --force --no-interaction 2>&1) || {
+    if printf '%s' "$migrate_out" | grep -qi "already exists"; then
+        echo "WARNING: Algumas tabelas ja existem, continuando..."
+    else
+        printf '%s\n' "$migrate_out"
+        echo "FATAL: Migration falhou."
+        exit 1
+    fi
+}
+printf '%s\n' "$migrate_out"
 
 exec "$@"
