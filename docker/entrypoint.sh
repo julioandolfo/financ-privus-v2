@@ -3,6 +3,9 @@ set -e
 
 cd /var/www/html
 
+# Laravel exige .env presente mesmo quando usa variáveis de ambiente Docker
+[ -f .env ] || touch .env
+
 # Gera APP_KEY automaticamente se não definida
 if [ -z "$APP_KEY" ]; then
     php artisan key:generate --force --no-interaction
