@@ -51,6 +51,11 @@
             Receitas Recorrentes
         </x-layouts.nav-item>
 
+        <x-layouts.nav-item href="{{ route('extratos.index') }}" :active="request()->routeIs('extratos.*')">
+            <x-slot:icon><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" /></svg></x-slot:icon>
+            Extrato Bancário
+        </x-layouts.nav-item>
+
         <x-layouts.nav-item href="{{ route('conciliacao.index') }}" :active="request()->routeIs('conciliacao.*')">
             <x-slot:icon><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /></svg></x-slot:icon>
             Conciliação Bancária

@@ -24,6 +24,7 @@ use App\Http\Controllers\MovimentacaoCaixaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\PontoEquilibrioController;
+use App\Http\Controllers\ExtratoBancarioController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn() => redirect()->route('dashboard'));
@@ -87,6 +88,12 @@ Route::middleware('auth')->group(function () {
     Route::resource('receitas-recorrentes', ReceitaRecorrenteController::class)->names('receitas-recorrentes')->except(['show']);
     Route::post('receitas-recorrentes/{receitasRecorrente}/toggle', [ReceitaRecorrenteController::class, 'toggle'])->name('receitas-recorrentes.toggle');
     Route::post('receitas-recorrentes/{receitasRecorrente}/gerar', [ReceitaRecorrenteController::class, 'gerarAgora'])->name('receitas-recorrentes.gerar');
+
+    Route::resource('extratos', ExtratoBancarioController::class)->only(['index', 'create', 'store', 'show', 'destroy']);
+    Route::post('extratos/{extrato}/lancamentos/{lancamento}/conciliar', [ExtratoBancarioController::class, 'conciliarLancamento'])->name('extratos.conciliar');
+    Route::post('extratos/{extrato}/lancamentos/{lancamento}/ignorar', [ExtratoBancarioController::class, 'ignorarLancamento'])->name('extratos.ignorar');
+    Route::post('extratos/{extrato}/lancamentos/{lancamento}/desconciliar', [ExtratoBancarioController::class, 'desconciliarLancamento'])->name('extratos.desconciliar');
+    Route::post('extratos/{extrato}/lancamentos/{lancamento}/criar-movimentacao', [ExtratoBancarioController::class, 'criarMovimentacao'])->name('extratos.criar-movimentacao');
 
     Route::get('/conciliacao', [ConciliacaoController::class, 'index'])->name('conciliacao.index');
     Route::post('/conciliacao/conciliar', [ConciliacaoController::class, 'conciliar'])->name('conciliacao.conciliar');
