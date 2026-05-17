@@ -42,6 +42,9 @@ class MigrateLegado extends Command
             'contas_pagar'          => fn() => $this->migrarContasPagar(),
             'contas_receber'        => fn() => $this->migrarContasReceber(),
             'parcelas_receber'      => fn() => $this->migrarParcelasReceber(),
+            'despesas_recorrentes'  => fn() => $this->migrarDespesasRecorrentes(),
+            'receitas_recorrentes'  => fn() => $this->migrarReceitasRecorrentes(),
+            'movimentacoes_caixa'   => fn() => $this->migrarMovimentacoesCaixa(),
         ];
 
         $only = $this->option('only');
@@ -609,6 +612,148 @@ class MigrateLegado extends Command
             'quitado'   => 'pago',
         ];
         return $map[strtolower(trim($status))] ?? 'pendente';
+    }
+
+    // -------------------------------------------------------------------------
+    // DESPESAS RECORRENTES
+    // -------------------------------------------------------------------------
+    private function migrarDespesasRecorrentes(): void
+    {
+        if (! $this->legado->getSchemaBuilder()->hasTable('despesas_recorrentes')) {
+            $this->line('  tabela despesas_recorrentes não existe no legado, pulando.');
+            return;
+        }
+
+        $count = 0;
+        $this->legado->table('despesas_recorrentes')->orderBy('id')->chunk(500, function ($rows) use (&$count) {
+            $insert = $rows->map(fn($r) => [
+                'id'                   => $r->id,
+                'empresa_id'           => $r->empresa_id,
+                'user_id'              => $r->usuario_cadastro_id ?? 1,
+                'fornecedor_id'        => $r->fornecedor_id ?? null,
+                'categoria_id'         => $r->categoria_id ?? null,
+                'centro_custo_id'      => $r->centro_custo_id ?? null,
+                'forma_pagamento_id'   => $r->forma_pagamento_id ?? null,
+                'conta_bancaria_id'    => $r->conta_bancaria_id ?? null,
+                'descricao'            => $r->descricao,
+                'valor'                => $r->valor,
+                'frequencia'           => $r->frequencia ?? 'mensal',
+                'dia_mes'              => $r->dia_mes ?? null,
+                'dia_semana'           => $r->dia_semana ?? null,
+                'intervalo_dias'       => $r->intervalo_dias ?? null,
+                'data_inicio'          => $r->data_inicio,
+                'data_fim'             => $r->data_fim ?? null,
+                'max_ocorrencias'      => $r->max_ocorrencias ?? null,
+                'ocorrencias_geradas'  => $r->ocorrencias_geradas ?? 0,
+                'proxima_geracao'      => $r->proxima_geracao ?? $r->data_inicio,
+                'ultima_geracao'       => $r->ultima_geracao ?? null,
+                'antecedencia_dias'    => $r->antecedencia_dias ?? 5,
+                'status_inicial'       => in_array($r->status_inicial ?? 'pendente', ['pago']) ? 'pago' : 'pendente',
+                'criar_automaticamente'=> $r->criar_automaticamente ?? 1,
+                'ajuste_fim_semana'    => $r->ajuste_fim_semana ?? 'manter',
+                'ativo'                => $r->ativo ?? 1,
+                'observacoes'          => $r->observacoes ?? null,
+                'created_at'           => $r->data_cadastro ?? now(),
+                'updated_at'           => $r->data_cadastro ?? now(),
+            ])->toArray();
+
+            DB::table('despesas_recorrentes')->upsert($insert, ['id'], array_keys($insert[0] ?? []));
+            $count += count($insert);
+        });
+
+        $this->line("  ✓ {$count} despesas recorrentes migradas.");
+    }
+
+    // -------------------------------------------------------------------------
+    // RECEITAS RECORRENTES
+    // -------------------------------------------------------------------------
+    private function migrarReceitasRecorrentes(): void
+    {
+        if (! $this->legado->getSchemaBuilder()->hasTable('receitas_recorrentes')) {
+            $this->line('  tabela receitas_recorrentes não existe no legado, pulando.');
+            return;
+        }
+
+        $count = 0;
+        $this->legado->table('receitas_recorrentes')->orderBy('id')->chunk(500, function ($rows) use (&$count) {
+            $insert = $rows->map(fn($r) => [
+                'id'                   => $r->id,
+                'empresa_id'           => $r->empresa_id,
+                'user_id'              => $r->usuario_cadastro_id ?? 1,
+                'cliente_id'           => $r->cliente_id ?? null,
+                'categoria_id'         => $r->categoria_id ?? null,
+                'centro_custo_id'      => $r->centro_custo_id ?? null,
+                'forma_pagamento_id'   => $r->forma_pagamento_id ?? null,
+                'conta_bancaria_id'    => $r->conta_bancaria_id ?? null,
+                'descricao'            => $r->descricao,
+                'valor'                => $r->valor,
+                'frequencia'           => $r->frequencia ?? 'mensal',
+                'dia_mes'              => $r->dia_mes ?? null,
+                'dia_semana'           => $r->dia_semana ?? null,
+                'intervalo_dias'       => $r->intervalo_dias ?? null,
+                'data_inicio'          => $r->data_inicio,
+                'data_fim'             => $r->data_fim ?? null,
+                'max_ocorrencias'      => $r->max_ocorrencias ?? null,
+                'ocorrencias_geradas'  => $r->ocorrencias_geradas ?? 0,
+                'proxima_geracao'      => $r->proxima_geracao ?? $r->data_inicio,
+                'ultima_geracao'       => $r->ultima_geracao ?? null,
+                'antecedencia_dias'    => $r->antecedencia_dias ?? 5,
+                'status_inicial'       => in_array($r->status_inicial ?? 'pendente', ['recebido']) ? 'recebido' : 'pendente',
+                'criar_automaticamente'=> $r->criar_automaticamente ?? 1,
+                'ajuste_fim_semana'    => $r->ajuste_fim_semana ?? 'manter',
+                'ativo'                => $r->ativo ?? 1,
+                'observacoes'          => $r->observacoes ?? null,
+                'created_at'           => $r->data_cadastro ?? now(),
+                'updated_at'           => $r->data_cadastro ?? now(),
+            ])->toArray();
+
+            DB::table('receitas_recorrentes')->upsert($insert, ['id'], array_keys($insert[0] ?? []));
+            $count += count($insert);
+        });
+
+        $this->line("  ✓ {$count} receitas recorrentes migradas.");
+    }
+
+    // -------------------------------------------------------------------------
+    // MOVIMENTAÇÕES DE CAIXA
+    // -------------------------------------------------------------------------
+    private function migrarMovimentacoesCaixa(): void
+    {
+        $tabela = $this->legado->getSchemaBuilder()->hasTable('movimentacoes_caixa')
+            ? 'movimentacoes_caixa'
+            : ($this->legado->getSchemaBuilder()->hasTable('movimentacoes') ? 'movimentacoes' : null);
+
+        if (! $tabela) {
+            $this->line('  tabela de movimentações não encontrada no legado, pulando.');
+            return;
+        }
+
+        $count = 0;
+        $this->legado->table($tabela)->orderBy('id')->chunk(500, function ($rows) use (&$count) {
+            $insert = $rows->map(fn($r) => [
+                'id'                => $r->id,
+                'empresa_id'        => $r->empresa_id,
+                'conta_bancaria_id' => $r->conta_bancaria_id,
+                'categoria_id'      => $r->categoria_id ?? null,
+                'centro_custo_id'   => $r->centro_custo_id ?? null,
+                'forma_pagamento_id'=> $r->forma_pagamento_id ?? null,
+                'user_id'           => $r->usuario_cadastro_id ?? $r->user_id ?? 1,
+                'tipo'              => in_array($r->tipo ?? '', ['entrada', 'saida']) ? $r->tipo : 'entrada',
+                'descricao'         => $r->descricao,
+                'valor'             => abs($r->valor),
+                'data_movimentacao' => $r->data_movimentacao ?? $r->data_movimento ?? now(),
+                'data_competencia'  => $r->data_competencia ?? null,
+                'conciliado'        => $r->conciliado ?? 0,
+                'observacoes'       => $r->observacoes ?? null,
+                'created_at'        => $r->created_at ?? now(),
+                'updated_at'        => $r->updated_at ?? now(),
+            ])->toArray();
+
+            DB::table('movimentacoes_caixa')->upsert($insert, ['id'], array_keys($insert[0] ?? []));
+            $count += count($insert);
+        });
+
+        $this->line("  ✓ {$count} movimentações de caixa migradas.");
     }
 
     private function isJson(string $str): bool
