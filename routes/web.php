@@ -11,6 +11,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\FormaPagamentoController;
 use App\Http\Controllers\FornecedorController;
+use App\Http\Controllers\ConciliacaoController;
 use App\Http\Controllers\DreController;
 use App\Http\Controllers\FluxoCaixaController;
 use App\Http\Controllers\MovimentacaoCaixaController;
@@ -55,4 +56,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/relatorios/fluxo-caixa', [FluxoCaixaController::class, 'index'])->name('relatorios.fluxo-caixa');
     Route::get('/relatorios/dre', [DreController::class, 'index'])->name('relatorios.dre');
+
+    Route::get('/conciliacao', [ConciliacaoController::class, 'index'])->name('conciliacao.index');
+    Route::post('/conciliacao/conciliar', [ConciliacaoController::class, 'conciliar'])->name('conciliacao.conciliar');
+    Route::post('/conciliacao/desconciliar', [ConciliacaoController::class, 'desconciliar'])->name('conciliacao.desconciliar');
+    Route::post('/conciliacao/{movimentacao}/toggle', [ConciliacaoController::class, 'conciliarItem'])->name('conciliacao.toggle');
 });
