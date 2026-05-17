@@ -22,16 +22,19 @@ if [ "$APP_ENV" = "production" ]; then
     php artisan event:cache   || true
 fi
 
-# Migrations (aguarda o DB estar pronto)
+# Aguarda o DB estar pronto (apenas conectividade, sem rodar migrations)
 attempt=0
-until php artisan migrate --force --no-interaction 2>/dev/null; do
+until php artisan db:show --json > /dev/null 2>&1; do
     attempt=$((attempt + 1))
-    if [ $attempt -ge 10 ]; then
-        echo "DB nao respondeu apos 10 tentativas. Abortando."
+    if [ $attempt -ge 20 ]; then
+        echo "DB nao respondeu apos 20 tentativas. Abortando."
         exit 1
     fi
-    echo "Aguardando banco de dados... tentativa $attempt/10"
+    echo "Aguardando banco de dados... tentativa $attempt/20"
     sleep 3
 done
+
+# Roda migrations uma unica vez — falha real aborta o container
+php artisan migrate --force --no-interaction
 
 exec "$@"
