@@ -41,6 +41,16 @@
             Contas Bancárias
         </x-layouts.nav-item>
 
+        <x-layouts.nav-item href="{{ route('despesas-recorrentes.index') }}" :active="request()->routeIs('despesas-recorrentes.*')">
+            <x-slot:icon><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" /></svg></x-slot:icon>
+            Despesas Recorrentes
+        </x-layouts.nav-item>
+
+        <x-layouts.nav-item href="{{ route('receitas-recorrentes.index') }}" :active="request()->routeIs('receitas-recorrentes.*')">
+            <x-slot:icon><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" /></svg></x-slot:icon>
+            Receitas Recorrentes
+        </x-layouts.nav-item>
+
         <x-layouts.nav-item href="{{ route('conciliacao.index') }}" :active="request()->routeIs('conciliacao.*')">
             <x-slot:icon><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" /></svg></x-slot:icon>
             Conciliação Bancária

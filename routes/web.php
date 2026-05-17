@@ -12,6 +12,8 @@ use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\FormaPagamentoController;
 use App\Http\Controllers\FornecedorController;
 use App\Http\Controllers\ConciliacaoController;
+use App\Http\Controllers\DespesaRecorrenteController;
+use App\Http\Controllers\ReceitaRecorrenteController;
 use App\Http\Controllers\DreController;
 use App\Http\Controllers\FluxoCaixaController;
 use App\Http\Controllers\MovimentacaoCaixaController;
@@ -56,6 +58,14 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/relatorios/fluxo-caixa', [FluxoCaixaController::class, 'index'])->name('relatorios.fluxo-caixa');
     Route::get('/relatorios/dre', [DreController::class, 'index'])->name('relatorios.dre');
+
+    Route::resource('despesas-recorrentes', DespesaRecorrenteController::class)->names('despesas-recorrentes')->except(['show']);
+    Route::post('despesas-recorrentes/{despesasRecorrente}/toggle', [DespesaRecorrenteController::class, 'toggle'])->name('despesas-recorrentes.toggle');
+    Route::post('despesas-recorrentes/{despesasRecorrente}/gerar', [DespesaRecorrenteController::class, 'gerarAgora'])->name('despesas-recorrentes.gerar');
+
+    Route::resource('receitas-recorrentes', ReceitaRecorrenteController::class)->names('receitas-recorrentes')->except(['show']);
+    Route::post('receitas-recorrentes/{receitasRecorrente}/toggle', [ReceitaRecorrenteController::class, 'toggle'])->name('receitas-recorrentes.toggle');
+    Route::post('receitas-recorrentes/{receitasRecorrente}/gerar', [ReceitaRecorrenteController::class, 'gerarAgora'])->name('receitas-recorrentes.gerar');
 
     Route::get('/conciliacao', [ConciliacaoController::class, 'index'])->name('conciliacao.index');
     Route::post('/conciliacao/conciliar', [ConciliacaoController::class, 'conciliar'])->name('conciliacao.conciliar');
