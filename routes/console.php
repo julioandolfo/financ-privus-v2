@@ -10,3 +10,4 @@ Artisan::command('inspire', function () {
 
 Schedule::command('recorrencias:processar')->dailyAt('06:00');
 Schedule::command('woocommerce:sincronizar')->everyThirtyMinutes();
+Schedule::command('whatsapp:notificar')->dailyAt('09:00');
