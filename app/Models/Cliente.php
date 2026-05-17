@@ -1,0 +1,46 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Cliente extends Model
+{
+    use SoftDeletes;
+
+    protected $fillable = [
+        'empresa_id', 'codigo', 'tipo', 'nome_razao_social', 'nome_fantasia',
+        'cpf_cnpj', 'email', 'telefone', 'celular', 'endereco', 'observacoes', 'ativo',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'ativo' => 'boolean',
+            'endereco' => 'array',
+        ];
+    }
+
+    public function empresa(): BelongsTo
+    {
+        return $this->belongsTo(Empresa::class);
+    }
+
+    public function contasReceber(): HasMany
+    {
+        return $this->hasMany(ContaReceber::class);
+    }
+
+    public function scopeAtivos($query)
+    {
+        return $query->where('ativo', true);
+    }
+
+    public function getNomeExibicaoAttribute(): string
+    {
+        return $this->nome_fantasia ?: $this->nome_razao_social;
+    }
+}

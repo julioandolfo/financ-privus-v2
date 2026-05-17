@@ -2,15 +2,16 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EmpresaController;
+use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\FornecedorController;
 use App\Http\Controllers\ContasPagarController;
 use App\Http\Controllers\ContasReceberController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-// Redirect root
 Route::get('/', fn() => redirect()->route('dashboard'));
 
-// Auth routes (guest only)
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
@@ -19,12 +20,20 @@ Route::middleware('guest')->group(function () {
 
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-// Authenticated routes
 Route::middleware('auth')->group(function () {
+
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/perfil', [ProfileController::class, 'index'])->name('profile');
 
-    // Financeiro
+    Route::resource('empresas', EmpresaController::class)->names('empresas');
+    Route::resource('clientes', ClienteController::class)->names('clientes');
+    Route::resource('fornecedores', FornecedorController::class)->names('fornecedores');
+
     Route::resource('contas-pagar', ContasPagarController::class)->names('contas-pagar');
+    Route::post('contas-pagar/{contaPagar}/baixar', [ContasPagarController::class, 'baixar'])->name('contas-pagar.baixar');
+    Route::post('contas-pagar/baixa-massa', [ContasPagarController::class, 'baixaMassa'])->name('contas-pagar.baixa-massa');
+
     Route::resource('contas-receber', ContasReceberController::class)->names('contas-receber');
+    Route::post('contas-receber/{contaReceber}/baixar', [ContasReceberController::class, 'baixar'])->name('contas-receber.baixar');
+    Route::post('contas-receber/baixa-massa', [ContasReceberController::class, 'baixaMassa'])->name('contas-receber.baixa-massa');
 });
