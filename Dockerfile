@@ -1,18 +1,4 @@
-# ─── Stage 1: Node (build frontend assets) ────────────────────────────────────
-FROM node:22-alpine AS node-builder
-
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm ci
-
-COPY resources/ resources/
-COPY vite.config.js ./
-COPY public/ public/
-
-RUN npm run build
-
-# ─── Stage 2: Composer (instala dependências PHP) ─────────────────────────────
+# ─── Stage 1: Composer (instala dependências PHP) ─────────────────────────────
 FROM php:8.4-cli-alpine AS composer-builder
 
 RUN apk add --no-cache \
@@ -40,6 +26,24 @@ RUN composer install \
 COPY . .
 
 RUN composer dump-autoload --optimize --no-scripts
+
+# ─── Stage 2: Node (build frontend assets, com vendor disponível p/ Tailwind) ─
+FROM node:22-alpine AS node-builder
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY resources/ resources/
+COPY vite.config.js ./
+COPY public/ public/
+COPY app/ app/
+
+# vendor necessário para @source dos templates de paginação e Livewire
+COPY --from=composer-builder /app/vendor /app/vendor
+
+RUN npm run build
 
 # ─── Stage 3: Final production image ──────────────────────────────────────────
 FROM php:8.4-fpm-alpine AS production
