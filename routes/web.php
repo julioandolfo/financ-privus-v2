@@ -11,6 +11,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\FormaPagamentoController;
 use App\Http\Controllers\FornecedorController;
+use App\Http\Controllers\DreController;
+use App\Http\Controllers\FluxoCaixaController;
 use App\Http\Controllers\MovimentacaoCaixaController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +31,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/perfil', [ProfileController::class, 'index'])->name('profile');
+    Route::put('/perfil', [ProfileController::class, 'update'])->name('profile.update');
 
     Route::resource('empresas', EmpresaController::class)->names('empresas');
     Route::resource('clientes', ClienteController::class)->names('clientes');
@@ -49,4 +52,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('categorias', CategoriaFinanceiraController::class)->names('categorias')->except(['show']);
     Route::resource('centros-custo', CentroCustoController::class)->names('centros-custo')->except(['show']);
     Route::resource('formas-pagamento', FormaPagamentoController::class)->names('formas-pagamento')->except(['show']);
+
+    Route::get('/relatorios/fluxo-caixa', [FluxoCaixaController::class, 'index'])->name('relatorios.fluxo-caixa');
+    Route::get('/relatorios/dre', [DreController::class, 'index'])->name('relatorios.dre');
 });

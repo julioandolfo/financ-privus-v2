@@ -27,7 +27,7 @@
                 </div>
             </div>
 
-            <form method="POST" action="{{ route('profile') }}">
+            <form method="POST" action="{{ route('profile.update') }}">
                 @csrf @method('PUT')
                 <div class="space-y-4">
                     <x-ui.input name="name" label="Nome" required value="{{ old('name', auth()->user()->name) }}" :error="$errors->first('name')" />
@@ -41,7 +41,7 @@
 
         <x-ui.card>
             <h2 class="text-sm font-semibold text-surface-700 dark:text-surface-300 mb-4">Alterar Senha</h2>
-            <form method="POST" action="{{ route('profile') }}">
+            <form method="POST" action="{{ route('profile.update') }}">
                 @csrf @method('PUT')
                 <div class="space-y-4">
                     <x-ui.input name="current_password" type="password" label="Senha Atual" :error="$errors->first('current_password')" />
