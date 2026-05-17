@@ -14,7 +14,9 @@ use App\Http\Controllers\FornecedorController;
 use App\Http\Controllers\ConciliacaoController;
 use App\Http\Controllers\DespesaRecorrenteController;
 use App\Http\Controllers\ReceitaRecorrenteController;
+use App\Http\Controllers\ApiController;
 use App\Http\Controllers\DreController;
+use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\FluxoCaixaController;
 use App\Http\Controllers\MovimentacaoCaixaController;
 use App\Http\Controllers\ProfileController;
@@ -55,6 +57,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('categorias', CategoriaFinanceiraController::class)->names('categorias')->except(['show']);
     Route::resource('centros-custo', CentroCustoController::class)->names('centros-custo')->except(['show']);
     Route::resource('formas-pagamento', FormaPagamentoController::class)->names('formas-pagamento')->except(['show']);
+
+    Route::resource('usuarios', UsuarioController::class)->names('usuarios')->except(['show']);
+
+    Route::get('/api/cnpj/{cnpj}', [ApiController::class, 'buscarCnpj'])->name('api.cnpj');
 
     Route::get('/relatorios/fluxo-caixa', [FluxoCaixaController::class, 'index'])->name('relatorios.fluxo-caixa');
     Route::get('/relatorios/dre', [DreController::class, 'index'])->name('relatorios.dre');
