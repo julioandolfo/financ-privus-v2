@@ -6,6 +6,7 @@ use App\Models\Empresa;
 use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class CriarAdmin extends Command
 {
@@ -44,6 +45,7 @@ class CriarAdmin extends Command
                 $razao = $this->ask('Nenhuma empresa encontrada. Informe a Razão Social');
                 $empresa = Empresa::create([
                     'razao_social' => $razao,
+                    'codigo'       => strtoupper(substr(Str::slug($razao, ''), 0, 15)) ?: Str::upper(Str::random(8)),
                     'ativo'        => true,
                 ]);
                 $this->info("Empresa criada: ID {$empresa->id}");
