@@ -15,6 +15,7 @@ use App\Http\Controllers\ConciliacaoController;
 use App\Http\Controllers\DespesaRecorrenteController;
 use App\Http\Controllers\ReceitaRecorrenteController;
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\ConfiguracaoController;
 use App\Http\Controllers\DreController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\FluxoCaixaController;
@@ -61,6 +62,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('usuarios', UsuarioController::class)->names('usuarios')->except(['show']);
 
     Route::get('/api/cnpj/{cnpj}', [ApiController::class, 'buscarCnpj'])->name('api.cnpj');
+
+    Route::get('/configuracoes', [ConfiguracaoController::class, 'index'])->name('configuracoes.index');
+    Route::put('/configuracoes', [ConfiguracaoController::class, 'update'])->name('configuracoes.update');
 
     Route::get('/relatorios/fluxo-caixa', [FluxoCaixaController::class, 'index'])->name('relatorios.fluxo-caixa');
     Route::get('/relatorios/dre', [DreController::class, 'index'])->name('relatorios.dre');
