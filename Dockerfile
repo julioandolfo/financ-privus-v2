@@ -17,16 +17,14 @@ FROM composer:2 AS composer-builder
 
 WORKDIR /app
 
-COPY composer*.json ./
+COPY . .
 RUN composer install \
     --no-dev \
     --no-interaction \
     --no-scripts \
     --prefer-dist \
-    --optimize-autoloader
-
-COPY . .
-RUN composer dump-autoload --optimize --classmap-authoritative
+    --optimize-autoloader \
+    && composer dump-autoload --optimize
 
 # ─── Stage 3: Final production image ──────────────────────────────────────────
 FROM php:8.4-fpm-alpine AS production
