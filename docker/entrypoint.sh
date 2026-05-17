@@ -8,7 +8,9 @@ cd /var/www/html
 
 # Gera APP_KEY automaticamente se não definida
 if [ -z "$APP_KEY" ]; then
-    php artisan key:generate --force --no-interaction
+    APP_KEY="base64:$(openssl rand -base64 32)"
+    echo "APP_KEY=${APP_KEY}" >> .env
+    export APP_KEY
 fi
 
 # Storage link (idempotente)
