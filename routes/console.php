@@ -9,5 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('recorrencias:processar')->dailyAt('06:00');
-Schedule::command('woocommerce:sincronizar')->everyThirtyMinutes();
 Schedule::command('whatsapp:notificar')->dailyAt('09:00');
