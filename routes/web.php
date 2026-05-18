@@ -32,6 +32,8 @@ use App\Http\Controllers\ExtratoBancarioController;
 use App\Http\Controllers\MigracaoLegadoController;
 use App\Http\Controllers\TransacaoPendenteController;
 use App\Http\Controllers\WhatsAppController;
+use App\Http\Controllers\InadimplenciaController;
+use App\Http\Controllers\DfcController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn() => redirect()->route('dashboard'));
@@ -62,13 +64,21 @@ Route::middleware('auth')->group(function () {
     Route::resource('fornecedores', FornecedorController::class)->names('fornecedores');
 
     // Financeiro
-    Route::resource('contas-pagar', ContasPagarController::class)->names('contas-pagar');
-    Route::post('contas-pagar/{contaPagar}/baixar', [ContasPagarController::class, 'baixar'])->name('contas-pagar.baixar');
+    Route::get('contas-pagar/deletados', [ContasPagarController::class, 'deletados'])->name('contas-pagar.deletados');
+    Route::post('contas-pagar/{id}/restore', [ContasPagarController::class, 'restore'])->name('contas-pagar.restore');
     Route::post('contas-pagar/baixa-massa', [ContasPagarController::class, 'baixaMassa'])->name('contas-pagar.baixa-massa');
+    Route::post('contas-pagar/{contaPagar}/baixar', [ContasPagarController::class, 'baixar'])->name('contas-pagar.baixar');
+    Route::post('contas-pagar/{contaPagar}/cancelar-baixa', [ContasPagarController::class, 'cancelarBaixa'])->name('contas-pagar.cancelar-baixa');
+    Route::get('contas-pagar/{contaPagar}', [ContasPagarController::class, 'show'])->name('contas-pagar.show');
+    Route::resource('contas-pagar', ContasPagarController::class)->names('contas-pagar')->except(['show']);
 
-    Route::resource('contas-receber', ContasReceberController::class)->names('contas-receber');
-    Route::post('contas-receber/{contaReceber}/baixar', [ContasReceberController::class, 'baixar'])->name('contas-receber.baixar');
+    Route::get('contas-receber/deletados', [ContasReceberController::class, 'deletados'])->name('contas-receber.deletados');
+    Route::post('contas-receber/{id}/restore', [ContasReceberController::class, 'restore'])->name('contas-receber.restore');
     Route::post('contas-receber/baixa-massa', [ContasReceberController::class, 'baixaMassa'])->name('contas-receber.baixa-massa');
+    Route::post('contas-receber/{contaReceber}/baixar', [ContasReceberController::class, 'baixar'])->name('contas-receber.baixar');
+    Route::post('contas-receber/{contaReceber}/cancelar-baixa', [ContasReceberController::class, 'cancelarBaixa'])->name('contas-receber.cancelar-baixa');
+    Route::get('contas-receber/{contaReceber}', [ContasReceberController::class, 'show'])->name('contas-receber.show');
+    Route::resource('contas-receber', ContasReceberController::class)->names('contas-receber')->except(['show']);
 
     // Boletos
     Route::resource('boletos', BoletoController::class)->except(['edit', 'update'])->names('boletos');
@@ -111,6 +121,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/whatsapp/conexoes/{config}', [WhatsAppController::class, 'conexaoUpdate'])->name('whatsapp.conexoes.update');
     Route::delete('/whatsapp/conexoes/{config}', [WhatsAppController::class, 'conexaoDestroy'])->name('whatsapp.conexoes.destroy');
     Route::post('/whatsapp/conexoes/{config}/testar', [WhatsAppController::class, 'testar'])->name('whatsapp.conexoes.testar');
+    Route::get('/whatsapp/conexoes/{config}/qrcode', [WhatsAppController::class, 'conexaoQrcode'])->name('whatsapp.conexoes.qrcode');
     Route::get('/whatsapp/regras', [WhatsAppController::class, 'regrasIndex'])->name('whatsapp.regras.index');
     Route::get('/whatsapp/regras/create', [WhatsAppController::class, 'regraCreate'])->name('whatsapp.regras.create');
     Route::post('/whatsapp/regras', [WhatsAppController::class, 'regraStore'])->name('whatsapp.regras.store');
@@ -140,6 +151,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/relatorios/dre/pdf', [DreController::class, 'pdf'])->name('relatorios.dre.pdf');
     Route::get('/relatorios/ponto-equilibrio', [PontoEquilibrioController::class, 'index'])->name('relatorios.ponto-equilibrio');
     Route::get('/relatorios/ponto-equilibrio/pdf', [PontoEquilibrioController::class, 'pdf'])->name('relatorios.ponto-equilibrio.pdf');
+    Route::get('/relatorios/inadimplencia', [InadimplenciaController::class, 'index'])->name('relatorios.inadimplencia');
+    Route::get('/relatorios/inadimplencia/pdf', [InadimplenciaController::class, 'pdf'])->name('relatorios.inadimplencia.pdf');
+    Route::get('/relatorios/dfc', [DfcController::class, 'index'])->name('relatorios.dfc');
+    Route::get('/relatorios/dfc/pdf', [DfcController::class, 'pdf'])->name('relatorios.dfc.pdf');
 
     Route::resource('despesas-recorrentes', DespesaRecorrenteController::class)->names('despesas-recorrentes')->except(['show']);
     Route::post('despesas-recorrentes/{despesasRecorrente}/toggle', [DespesaRecorrenteController::class, 'toggle'])->name('despesas-recorrentes.toggle');

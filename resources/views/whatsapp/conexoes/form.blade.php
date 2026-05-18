@@ -123,6 +123,67 @@
 
             <div class="flex items-center justify-end gap-3">
                 <x-ui.button href="{{ route('whatsapp.conexoes.index') }}" variant="ghost">Cancelar</x-ui.button>
+                @if($isEdit)
+                <button type="button"
+                    x-data="{ open: false, loading: false, qrBase64: null, qrError: null }"
+                    @click="
+                        open = true;
+                        loading = true;
+                        qrBase64 = null;
+                        qrError = null;
+                        fetch('{{ route('whatsapp.conexoes.qrcode', $config) }}', {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                        })
+                        .then(r => r.json())
+                        .then(data => {
+                            loading = false;
+                            if (data.base64) {
+                                qrBase64 = data.base64;
+                            } else if (data.error) {
+                                qrError = data.error;
+                            } else {
+                                qrError = 'Resposta inesperada da API.';
+                            }
+                        })
+                        .catch(e => { loading = false; qrError = e.message; })
+                    "
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-medium hover:bg-green-700 transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z" />
+                    </svg>
+                    Ver QR Code
+
+                    {{-- Modal --}}
+                    <div x-show="open" x-cloak
+                        class="fixed inset-0 z-50 flex items-center justify-center p-4"
+                        @click.self="open = false">
+                        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="open = false"></div>
+                        <div class="relative bg-white dark:bg-surface-800 rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center"
+                            @click.stop>
+                            <button @click="open = false"
+                                class="absolute top-3 right-3 text-surface-400 hover:text-surface-600 dark:hover:text-surface-300">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                            <h3 class="text-base font-semibold text-surface-900 dark:text-white mb-4">QR Code — Conectar WhatsApp</h3>
+                            <div x-show="loading" class="flex items-center justify-center py-10">
+                                <svg class="animate-spin w-8 h-8 text-primary-500" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                                </svg>
+                            </div>
+                            <div x-show="!loading && qrBase64">
+                                <img :src="'data:image/png;base64,' + qrBase64" alt="QR Code" class="mx-auto w-56 h-56 rounded-xl border border-surface-200 dark:border-surface-700" />
+                                <p class="mt-3 text-xs text-surface-500">Abra o WhatsApp no seu celular e escaneie o código acima.</p>
+                            </div>
+                            <div x-show="!loading && qrError" class="py-6">
+                                <p class="text-sm text-red-500" x-text="qrError"></p>
+                            </div>
+                        </div>
+                    </div>
+                </button>
+                @endif
                 <x-ui.button type="submit">
                     {{ $isEdit ? 'Atualizar Conexão' : 'Salvar Conexão' }}
                 </x-ui.button>

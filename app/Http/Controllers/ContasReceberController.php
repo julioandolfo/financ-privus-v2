@@ -178,6 +178,53 @@ class ContasReceberController extends Controller
         return redirect()->route('contas-receber.index')->with('success', 'Baixa em massa realizada.');
     }
 
+    public function show(ContaReceber $contaReceber)
+    {
+        $this->authorizeEmpresa($contaReceber);
+        $contaReceber->load(['cliente', 'categoria', 'centroCusto', 'formaRecebimento', 'contaBancaria', 'user']);
+
+        return view('contas-receber.show', compact('contaReceber'));
+    }
+
+    public function cancelarBaixa(ContaReceber $contaReceber)
+    {
+        $this->authorizeEmpresa($contaReceber);
+
+        $contaReceber->update([
+            'status'           => 'pendente',
+            'data_recebimento' => null,
+            'valor_recebido'   => 0,
+            'desconto'         => 0,
+            'juros'            => 0,
+            'multa'            => 0,
+        ]);
+
+        return redirect()->back()->with('success', 'Baixa cancelada com sucesso.');
+    }
+
+    public function deletados()
+    {
+        $empresaId = auth()->user()->empresa_id;
+
+        $contas = ContaReceber::onlyTrashed()
+            ->where('empresa_id', $empresaId)
+            ->with(['cliente', 'categoria'])
+            ->orderBy('deleted_at', 'desc')
+            ->paginate(20);
+
+        return view('contas-receber.deletados', compact('contas'));
+    }
+
+    public function restore(int $id)
+    {
+        $conta = ContaReceber::onlyTrashed()->findOrFail($id);
+        abort_if($conta->empresa_id !== auth()->user()->empresa_id, 403);
+
+        $conta->restore();
+
+        return redirect()->route('contas-receber.deletados')->with('success', 'Conta restaurada com sucesso.');
+    }
+
     private function authorizeEmpresa(ContaReceber $conta): void
     {
         abort_if($conta->empresa_id !== auth()->user()->empresa_id, 403);

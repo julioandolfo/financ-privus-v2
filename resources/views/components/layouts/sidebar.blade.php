@@ -176,6 +176,16 @@
             Ponto de Equilíbrio
         </x-layouts.nav-item>
 
+        <x-layouts.nav-item href="{{ route('relatorios.dfc') }}" :active="request()->routeIs('relatorios.dfc')">
+            <x-slot:icon><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg></x-slot:icon>
+            DFC
+        </x-layouts.nav-item>
+
+        <x-layouts.nav-item href="{{ route('relatorios.inadimplencia') }}" :active="request()->routeIs('relatorios.inadimplencia')">
+            <x-slot:icon><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" /></svg></x-slot:icon>
+            Inadimplência
+        </x-layouts.nav-item>
+
         <x-layouts.nav-item href="{{ route('perfis-consolidacao.index') }}" :active="request()->routeIs('perfis-consolidacao.*')">
             <x-slot:icon><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 3.75 9v.75m16.5-2.872A2.25 2.25 0 0 1 20.25 9v.75m0 0a2.25 2.25 0 0 1-1.5 2.122M3.75 9.75a2.25 2.25 0 0 0 1.5 2.122m0 0V20.25M5.25 11.872V20.25m0 0h13.5m-13.5 0c-.621 0-1.125-.504-1.125-1.125V11.872m15.375 8.253c.621 0 1.125-.504 1.125-1.125V11.872" /></svg></x-slot:icon>
             Perfis de Consolidação

@@ -238,6 +238,25 @@ class WhatsAppController extends Controller
         return back()->with('success', $regra->ativo ? 'Regra ativada.' : 'Regra desativada.');
     }
 
+    public function conexaoQrcode(EvolutionConfig $config): JsonResponse
+    {
+        abort_if($config->empresa_id !== auth()->user()->empresa_id, 403);
+
+        try {
+            $response = Http::withHeaders([
+                'apikey' => $config->api_key,
+            ])->get("{$config->base_url}/instance/connect/{$config->instance_name}");
+
+            if ($response->successful()) {
+                return response()->json($response->json());
+            }
+
+            return response()->json(['error' => 'Falha ao obter QR Code'], 422);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
     // -------------------------------------------------------------------------
     // Helpers privados
     // -------------------------------------------------------------------------

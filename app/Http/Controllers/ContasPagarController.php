@@ -179,6 +179,53 @@ class ContasPagarController extends Controller
         return redirect()->route('contas-pagar.index')->with('success', 'Baixa em massa realizada.');
     }
 
+    public function show(ContaPagar $contaPagar)
+    {
+        $this->authorizeEmpresa($contaPagar);
+        $contaPagar->load(['fornecedor', 'categoria', 'centroCusto', 'formaPagamento', 'contaBancaria', 'user']);
+
+        return view('contas-pagar.show', compact('contaPagar'));
+    }
+
+    public function cancelarBaixa(ContaPagar $contaPagar)
+    {
+        $this->authorizeEmpresa($contaPagar);
+
+        $contaPagar->update([
+            'status'          => 'pendente',
+            'data_pagamento'  => null,
+            'valor_pago'      => 0,
+            'desconto'        => 0,
+            'juros'           => 0,
+            'multa'           => 0,
+        ]);
+
+        return redirect()->back()->with('success', 'Baixa cancelada com sucesso.');
+    }
+
+    public function deletados()
+    {
+        $empresaId = auth()->user()->empresa_id;
+
+        $contas = ContaPagar::onlyTrashed()
+            ->where('empresa_id', $empresaId)
+            ->with(['fornecedor', 'categoria'])
+            ->orderBy('deleted_at', 'desc')
+            ->paginate(20);
+
+        return view('contas-pagar.deletados', compact('contas'));
+    }
+
+    public function restore(int $id)
+    {
+        $conta = ContaPagar::onlyTrashed()->findOrFail($id);
+        abort_if($conta->empresa_id !== auth()->user()->empresa_id, 403);
+
+        $conta->restore();
+
+        return redirect()->route('contas-pagar.deletados')->with('success', 'Conta restaurada com sucesso.');
+    }
+
     private function authorizeEmpresa(ContaPagar $conta): void
     {
         abort_if($conta->empresa_id !== auth()->user()->empresa_id, 403);
