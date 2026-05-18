@@ -4,7 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\CategoriaProduto;
 use App\Models\Produto;
+use App\Models\ProdutoFoto;
+use App\Models\ProdutoVariacao;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProdutoController extends Controller
 {
@@ -112,6 +117,98 @@ class ProdutoController extends Controller
         $this->authorize($produto);
         $produto->delete();
         return back()->with('success', 'Produto removido.');
+    }
+
+    // -------------------------------------------------------------------------
+    // Variações
+    // -------------------------------------------------------------------------
+
+    public function variacoes(Produto $produto): JsonResponse
+    {
+        $this->authorize($produto);
+
+        return response()->json(
+            $produto->variacoes()->orderBy('atributo')->orderBy('valor')->get()
+        );
+    }
+
+    public function storeVariacao(Request $request, Produto $produto): JsonResponse
+    {
+        $this->authorize($produto);
+
+        $data = $request->validate([
+            'atributo'        => ['required', 'string', 'max:50'],
+            'valor'           => ['required', 'string', 'max:100'],
+            'sku'             => ['nullable', 'string', 'max:100'],
+            'preco_adicional' => ['nullable', 'numeric', 'min:0'],
+            'custo'           => ['nullable', 'numeric', 'min:0'],
+            'estoque'         => ['nullable', 'numeric', 'min:0'],
+        ]);
+
+        $variacao = $produto->variacoes()->create($data);
+
+        return response()->json($variacao, 201);
+    }
+
+    public function destroyVariacao(Produto $produto, ProdutoVariacao $variacao): JsonResponse
+    {
+        $this->authorize($produto);
+        abort_if($variacao->produto_id !== $produto->id, 404);
+
+        $variacao->delete();
+
+        return response()->json(['ok' => true]);
+    }
+
+    // -------------------------------------------------------------------------
+    // Fotos
+    // -------------------------------------------------------------------------
+
+    public function uploadFoto(Request $request, Produto $produto): JsonResponse
+    {
+        $this->authorize($produto);
+
+        $request->validate([
+            'foto' => ['required', 'file', 'image', 'max:5120'], // 5 MB
+        ]);
+
+        $file          = $request->file('foto');
+        $nomeOriginal  = $file->getClientOriginalName();
+        $path          = $file->store('produtos/' . $produto->id, 'public');
+
+        // If this is the first photo, mark it as principal
+        $temFotos = $produto->fotos()->exists();
+
+        $foto = $produto->fotos()->create([
+            'path'          => $path,
+            'nome_original' => $nomeOriginal,
+            'principal'     => !$temFotos,
+            'ordem'         => $produto->fotos()->max('ordem') + 1,
+        ]);
+
+        return response()->json([
+            'id'       => $foto->id,
+            'path'     => $foto->path,
+            'url'      => asset('storage/' . $foto->path),
+            'principal'=> $foto->principal,
+        ], 201);
+    }
+
+    public function destroyFoto(Produto $produto, ProdutoFoto $foto): JsonResponse
+    {
+        $this->authorize($produto);
+        abort_if($foto->produto_id !== $produto->id, 404);
+
+        Storage::disk('public')->delete($foto->path);
+        $foto->delete();
+
+        // If deleted photo was principal, assign principal to the next one
+        if ($foto->principal) {
+            $next = $produto->fotos()->orderBy('ordem')->first();
+            $next?->update(['principal' => true]);
+        }
+
+        return response()->json(['ok' => true]);
     }
 
     private function authorize(Produto $produto): void

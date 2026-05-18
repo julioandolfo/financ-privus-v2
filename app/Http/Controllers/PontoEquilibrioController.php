@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ContaPagar;
 use App\Models\ContaReceber;
 use App\Models\MovimentacaoCaixa;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -76,6 +77,59 @@ class PontoEquilibrioController extends Controller
             'margemContribuicao', 'pontoEquilibrio', 'resultado', 'percentualAtingido',
             'fixos', 'variaveis', 'mes', 'ano', 'meses', 'anos'
         ));
+    }
+
+    public function pdf(Request $request)
+    {
+        $empresaId = auth()->user()->empresa_id;
+
+        $mes  = (int) $request->get('mes', now()->month);
+        $ano  = (int) $request->get('ano', now()->year);
+
+        $inicio = Carbon::create($ano, $mes, 1)->startOfMonth();
+        $fim    = $inicio->copy()->endOfMonth();
+
+        $receitaTotal = ContaReceber::where('empresa_id', $empresaId)
+            ->where('status', 'recebido')
+            ->whereBetween('data_recebimento', [$inicio, $fim])
+            ->sum('valor_total');
+
+        $despesasPagas = ContaPagar::with('categoria')
+            ->where('empresa_id', $empresaId)
+            ->where('status', 'pago')
+            ->whereBetween('data_pagamento', [$inicio, $fim])
+            ->get();
+
+        $fixos    = $this->classificarCustos($despesasPagas, 'fixo');
+        $variaveis = $this->classificarCustos($despesasPagas, 'variavel');
+
+        $totalFixo     = $fixos->sum('valor_pago');
+        $totalVariavel = $variaveis->sum('valor_pago');
+        $totalDespesas = $totalFixo + $totalVariavel;
+
+        $margemContribuicao = $receitaTotal > 0
+            ? (($receitaTotal - $totalVariavel) / $receitaTotal) * 100
+            : 0;
+
+        $pontoEquilibrio = $margemContribuicao > 0
+            ? $totalFixo / ($margemContribuicao / 100)
+            : null;
+
+        $resultado = $receitaTotal - $totalDespesas;
+
+        $percentualAtingido = ($pontoEquilibrio && $pontoEquilibrio > 0)
+            ? min(($receitaTotal / $pontoEquilibrio) * 100, 200)
+            : 0;
+
+        $data = compact(
+            'receitaTotal', 'totalFixo', 'totalVariavel', 'totalDespesas',
+            'margemContribuicao', 'pontoEquilibrio', 'resultado', 'percentualAtingido',
+            'fixos', 'variaveis', 'mes', 'ano', 'inicio', 'fim'
+        );
+
+        return Pdf::loadView('relatorios.ponto-equilibrio-pdf', $data)
+            ->setPaper('a4', 'portrait')
+            ->stream('ponto-equilibrio.pdf');
     }
 
     private function classificarCustos(Collection $despesas, string $tipo): Collection

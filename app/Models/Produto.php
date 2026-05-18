@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Produto extends Model
@@ -36,6 +37,8 @@ class Produto extends Model
     public function empresa(): BelongsTo   { return $this->belongsTo(Empresa::class); }
     public function user(): BelongsTo      { return $this->belongsTo(User::class); }
     public function categoria(): BelongsTo { return $this->belongsTo(CategoriaProduto::class, 'categoria_id'); }
+    public function variacoes(): HasMany   { return $this->hasMany(ProdutoVariacao::class); }
+    public function fotos(): HasMany       { return $this->hasMany(ProdutoFoto::class)->orderBy('ordem'); }
 
     public function getMargemAttribute(): float
     {
