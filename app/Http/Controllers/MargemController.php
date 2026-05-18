@@ -17,9 +17,9 @@ class MargemController extends Controller
         $de  = $request->de  ?? now()->startOfMonth()->toDateString();
         $ate = $request->ate ?? now()->endOfMonth()->toDateString();
 
-        // Receitas pagas no período
+        // Receitas recebidas no período
         $receitas = ContaReceber::where('empresa_id', $empresaId)
-            ->where('status', 'pago')
+            ->where('status', 'recebido')
             ->whereBetween('data_recebimento', [$de, $ate])
             ->with('categoria')
             ->get();
@@ -60,7 +60,7 @@ class MargemController extends Controller
             $ini = $mes->copy()->startOfMonth()->toDateString();
             $fim = $mes->copy()->endOfMonth()->toDateString();
 
-            $r = ContaReceber::where('empresa_id', $empresaId)->where('status','pago')->whereBetween('data_recebimento',[$ini,$fim])->sum('valor_recebido');
+            $r = ContaReceber::where('empresa_id', $empresaId)->where('status','recebido')->whereBetween('data_recebimento',[$ini,$fim])->sum('valor_recebido');
             $d = ContaPagar::where('empresa_id', $empresaId)->where('status','pago')->whereBetween('data_pagamento',[$ini,$fim])->sum('valor_pago');
 
             $meses->push([
@@ -83,7 +83,7 @@ class MargemController extends Controller
         $de  = $request->de  ?? now()->startOfMonth()->toDateString();
         $ate = $request->ate ?? now()->endOfMonth()->toDateString();
 
-        $receitas = ContaReceber::where('empresa_id',$empresaId)->where('status','pago')->whereBetween('data_recebimento',[$de,$ate])->with('categoria')->get();
+        $receitas = ContaReceber::where('empresa_id',$empresaId)->where('status','recebido')->whereBetween('data_recebimento',[$de,$ate])->with('categoria')->get();
         $despesas = ContaPagar::where('empresa_id',$empresaId)->where('status','pago')->whereBetween('data_pagamento',[$de,$ate])->with('categoria')->get();
 
         $totalReceitas = $receitas->sum('valor_recebido');

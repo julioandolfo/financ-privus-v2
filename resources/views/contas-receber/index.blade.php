@@ -34,7 +34,7 @@
                     <option value="pendente" @selected(request('status') === 'pendente')>Pendente</option>
                     <option value="vencido"  @selected(request('status') === 'vencido')>Vencido</option>
                     <option value="parcial"  @selected(request('status') === 'parcial')>Parcial</option>
-                    <option value="pago"     @selected(request('status') === 'pago')>Recebido</option>
+                    <option value="recebido" @selected(request('status') === 'recebido')>Recebido</option>
                 </x-ui.select>
             </div>
             <div class="w-40">
@@ -136,7 +136,7 @@
                         <td class="px-5 py-4 text-sm text-surface-500">{{ $conta->cliente?->nome_razao_social ?? '—' }}</td>
                         <td class="px-5 py-4 text-sm text-surface-500 whitespace-nowrap">
                             {{ $conta->data_vencimento->format('d/m/Y') }}
-                            @if($conta->data_vencimento->isPast() && !in_array($conta->status, ['pago','cancelado']))
+                            @if($conta->data_vencimento->isPast() && !in_array($conta->status, ['recebido','cancelado']))
                             <span class="ml-1 text-xs text-red-500">({{ $conta->data_vencimento->diffForHumans() }})</span>
                             @endif
                         </td>
@@ -152,7 +152,7 @@
                                     'pendente'  => ['warning', 'Pendente'],
                                     'vencido'   => ['danger',  'Vencido'],
                                     'parcial'   => ['info',    'Parcial'],
-                                    'pago'      => ['success', 'Recebido'],
+                                    'recebido'  => ['success', 'Recebido'],
                                     'cancelado' => ['default', 'Cancelado'],
                                 ];
                                 [$variant, $label] = $statusMap[$conta->status] ?? ['default', $conta->status];
@@ -171,7 +171,7 @@
                                     Baixar
                                 </a>
                                 @endif
-                                @if($conta->status === 'pago')
+                                @if($conta->status === 'recebido')
                                 <form method="POST" action="{{ route('contas-receber.cancelar-baixa', $conta) }}"
                                       onsubmit="return confirm('Cancelar a baixa desta conta?')">
                                     @csrf

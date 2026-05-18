@@ -84,7 +84,7 @@ class DemoSeeder extends Seeder
 
         // Conta bancária
         $conta = ContaBancaria::firstOrCreate(
-            ['empresa_id' => $empresa->id, 'numero_conta' => '12345-6'],
+            ['empresa_id' => $empresa->id, 'conta' => '12345-6'],
             [
                 'nome'          => 'Conta Principal — Itaú',
                 'banco_nome'    => 'Itaú',

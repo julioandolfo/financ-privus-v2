@@ -60,7 +60,7 @@
                                     'pendente'  => ['warning', 'Pendente'],
                                     'vencido'   => ['danger',  'Vencido'],
                                     'parcial'   => ['info',    'Parcial'],
-                                    'pago'      => ['success', 'Recebido'],
+                                    'recebido'  => ['success', 'Recebido'],
                                     'cancelado' => ['default', 'Cancelado'],
                                 ];
                                 [$variant, $label] = $statusMap[$conta->status] ?? ['default', $conta->status];

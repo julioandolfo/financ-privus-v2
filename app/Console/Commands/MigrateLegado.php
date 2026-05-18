@@ -477,7 +477,7 @@ class MigrateLegado extends Command
                     'data_competencia'    => $r->data_competencia ?? null,
                     'data_recebimento'    => $r->data_recebimento ?? null,
                     'status'              => $this->normalizarStatusReceber($r->status ?? 'pendente'),
-                    'num_parcelas'        => $r->num_parcelas ?? 1,
+                    'num_parcelas'        => $r->numero_parcelas ?? $r->num_parcelas ?? 1,
                     'tem_rateio'          => $r->tem_rateio ?? false,
                     'observacoes'         => $r->observacoes ?? null,
                     'created_at'          => $r->data_cadastro ?? now(),
@@ -512,19 +512,22 @@ class MigrateLegado extends Command
             $insert = [];
             foreach ($rows as $r) {
                 $insert[] = [
-                    'id'                  => $r->id,
-                    'conta_receber_id'    => $r->conta_receber_id,
-                    'numero_parcela'      => $r->numero_parcela ?? 1,
-                    'valor_parcela'       => $r->valor_parcela ?? 0,
-                    'valor_recebido'      => $r->valor_recebido ?? 0,
-                    'desconto'            => $r->desconto ?? 0,
-                    'juros'               => $r->juros ?? 0,
-                    'multa'               => $r->multa ?? 0,
-                    'data_vencimento'     => $r->data_vencimento,
-                    'data_recebimento'    => $r->data_recebimento ?? null,
-                    'status'              => $this->normalizarStatusReceber($r->status ?? 'pendente'),
-                    'created_at'          => $r->created_at ?? now(),
-                    'updated_at'          => $r->updated_at ?? now(),
+                    'id'                   => $r->id,
+                    'conta_receber_id'     => $r->conta_receber_id,
+                    'numero_parcela'       => $r->numero_parcela ?? 1,
+                    'valor_parcela'        => $r->valor_parcela ?? 0,
+                    'valor_recebido'       => $r->valor_recebido ?? 0,
+                    'desconto'             => $r->desconto ?? 0,
+                    'juros'                => $r->juros ?? 0,
+                    'multa'                => $r->multa ?? 0,
+                    'data_vencimento'      => $r->data_vencimento,
+                    'data_recebimento'     => $r->data_recebimento ?? null,
+                    'status'               => $this->normalizarStatusParcelaReceber($r->status ?? 'pendente'),
+                    'forma_recebimento_id' => $r->forma_recebimento_id ?? null,
+                    'conta_bancaria_id'    => $r->conta_bancaria_id ?? null,
+                    'observacoes'          => $r->observacoes ?? null,
+                    'created_at'           => $r->created_at ?? now(),
+                    'updated_at'           => $r->updated_at ?? now(),
                 ];
                 $count++;
             }
@@ -602,18 +605,34 @@ class MigrateLegado extends Command
         return $map[strtolower(trim($status))] ?? 'pendente';
     }
 
+    private function normalizarStatusParcelaReceber(string $status): string
+    {
+        $map = [
+            'pendente'  => 'pendente',
+            'pago'      => 'recebido',
+            'recebido'  => 'recebido',
+            'vencido'   => 'vencido',
+            'cancelado' => 'cancelado',
+            'parcial'   => 'recebido',
+            'aberto'    => 'pendente',
+            'atrasado'  => 'vencido',
+            'quitado'   => 'recebido',
+        ];
+        return $map[strtolower(trim($status))] ?? 'pendente';
+    }
+
     private function normalizarStatusReceber(string $status): string
     {
         $map = [
             'pendente'  => 'pendente',
-            'pago'      => 'pago',
-            'recebido'  => 'pago',
+            'pago'      => 'recebido',
+            'recebido'  => 'recebido',
             'vencido'   => 'vencido',
             'cancelado' => 'cancelado',
             'parcial'   => 'parcial',
             'aberto'    => 'pendente',
             'atrasado'  => 'vencido',
-            'quitado'   => 'pago',
+            'quitado'   => 'recebido',
         ];
         return $map[strtolower(trim($status))] ?? 'pendente';
     }

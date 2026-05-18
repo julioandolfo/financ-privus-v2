@@ -11,7 +11,7 @@
             <h1 class="text-xl font-semibold text-surface-900 dark:text-white">{{ $contaReceber->descricao }}</h1>
         </div>
         <div class="flex items-center gap-2">
-            @if($contaReceber->status === 'pago' || $contaReceber->status === 'parcial')
+            @if($contaReceber->status === 'recebido' || $contaReceber->status === 'parcial')
             <form method="POST" action="{{ route('contas-receber.cancelar-baixa', $contaReceber) }}"
                   onsubmit="return confirm('Cancelar a baixa desta conta? O status voltará para pendente.')">
                 @csrf
@@ -127,7 +127,7 @@
                         <dt class="text-xs font-medium text-surface-500 uppercase tracking-wider mb-1">Vencimento</dt>
                         <dd class="text-sm text-surface-900 dark:text-white">
                             {{ $contaReceber->data_vencimento->format('d/m/Y') }}
-                            @if($contaReceber->data_vencimento->isPast() && !in_array($contaReceber->status, ['pago','cancelado']))
+                            @if($contaReceber->data_vencimento->isPast() && !in_array($contaReceber->status, ['recebido','cancelado']))
                             <span class="ml-1 text-xs text-red-500">({{ $contaReceber->data_vencimento->diffForHumans() }})</span>
                             @endif
                         </dd>
@@ -160,7 +160,7 @@
                         'pendente'  => ['warning', 'Pendente'],
                         'vencido'   => ['danger',  'Vencido'],
                         'parcial'   => ['info',    'Parcial'],
-                        'pago'      => ['success', 'Recebido'],
+                        'recebido'  => ['success', 'Recebido'],
                         'cancelado' => ['default', 'Cancelado'],
                     ];
                     [$variant, $label] = $statusMap[$contaReceber->status] ?? ['default', $contaReceber->status];
@@ -169,7 +169,7 @@
                     <x-ui.badge :variant="$variant" class="text-sm px-3 py-1">{{ $label }}</x-ui.badge>
                 </div>
 
-                @if($contaReceber->valor_aberto > 0 && $contaReceber->status !== 'pago')
+                @if($contaReceber->valor_aberto > 0 && $contaReceber->status !== 'recebido')
                 <div class="mt-4 pt-4 border-t border-surface-100 dark:border-surface-700">
                     <p class="text-xs text-surface-500 uppercase tracking-wider mb-1">Valor em Aberto</p>
                     <p class="text-xl font-bold text-red-600">R$ {{ number_format($contaReceber->valor_aberto, 2, ',', '.') }}</p>

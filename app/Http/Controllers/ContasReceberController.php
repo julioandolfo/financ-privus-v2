@@ -132,7 +132,7 @@ class ContasReceberController extends Controller
 
         $valorRecebido = $data['valor_recebido'];
         $valorAberto   = $contaReceber->valor_total - ($data['desconto'] ?? 0);
-        $status        = $valorRecebido >= $valorAberto ? 'pago' : 'parcial';
+        $status        = $valorRecebido >= $valorAberto ? 'recebido' : 'parcial';
 
         $contaReceber->update([
             'data_recebimento'    => $data['data_recebimento'],
@@ -169,7 +169,7 @@ class ContasReceberController extends Controller
                 $conta->update([
                     'data_recebimento'    => $request->data_recebimento,
                     'valor_recebido'      => $conta->valor_total,
-                    'status'              => 'pago',
+                    'status'              => 'recebido',
                     'forma_recebimento_id'=> $request->forma_recebimento_id ?? $conta->forma_recebimento_id,
                     'conta_bancaria_id'   => $request->conta_bancaria_id ?? $conta->conta_bancaria_id,
                 ]);

@@ -17,9 +17,9 @@ class DfcController extends Controller
         $de  = $request->de  ?? now()->startOfMonth()->toDateString();
         $ate = $request->ate ?? now()->endOfMonth()->toDateString();
 
-        // Recebimentos (ContaReceber pagas no período)
+        // Recebimentos (ContaReceber recebidas no período)
         $recebimentos = ContaReceber::where('empresa_id', $empresaId)
-            ->where('status', 'pago')
+            ->where('status', 'recebido')
             ->whereBetween('data_recebimento', [$de, $ate])
             ->with('cliente', 'categoria')
             ->orderBy('data_recebimento')
@@ -62,7 +62,7 @@ class DfcController extends Controller
         $de  = $request->de  ?? now()->startOfMonth()->toDateString();
         $ate = $request->ate ?? now()->endOfMonth()->toDateString();
 
-        $recebimentos  = ContaReceber::where('empresa_id', $empresaId)->where('status', 'pago')->whereBetween('data_recebimento', [$de, $ate])->with('cliente')->get();
+        $recebimentos  = ContaReceber::where('empresa_id', $empresaId)->where('status', 'recebido')->whereBetween('data_recebimento', [$de, $ate])->with('cliente')->get();
         $pagamentos    = ContaPagar::where('empresa_id', $empresaId)->where('status', 'pago')->whereBetween('data_pagamento', [$de, $ate])->with('fornecedor')->get();
         $movimentacoes = MovimentacaoCaixa::where('empresa_id', $empresaId)->whereBetween('data_movimentacao', [$de, $ate])->get();
 

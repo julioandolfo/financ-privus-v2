@@ -83,7 +83,7 @@ class DashboardController extends Controller
         // --- Receita / Despesa do mês corrente ---
         $mesAtual = Carbon::now();
         $receitasMes = ContaReceber::where('empresa_id', $empresaId)
-            ->where('status', 'pago')
+            ->where('status', 'recebido')
             ->whereMonth('data_recebimento', $mesAtual->month)
             ->whereYear('data_recebimento', $mesAtual->year)
             ->sum('valor_recebido');
@@ -94,10 +94,10 @@ class DashboardController extends Controller
             ->whereYear('data_pagamento', $mesAtual->year)
             ->sum('valor_pago');
 
-        // --- Inadimplência: ContaReceber vencidas (status != pago) ---
+        // --- Inadimplência: ContaReceber vencidas (status != recebido) ---
         $inadimplentesQuery = ContaReceber::where('empresa_id', $empresaId)
             ->where('data_vencimento', '<', today())
-            ->where('status', '!=', 'pago');
+            ->where('status', '!=', 'recebido');
 
         $inadimplentes = [
             'count' => $inadimplentesQuery->count(),
@@ -123,7 +123,7 @@ class DashboardController extends Controller
             $fluxoLabels[] = $shortMonths[$m];
 
             $fluxoEntradas[] = (float) ContaReceber::where('empresa_id', $empresaId)
-                ->where('status', 'pago')
+                ->where('status', 'recebido')
                 ->whereMonth('data_recebimento', $m)
                 ->whereYear('data_recebimento', $y)
                 ->sum('valor_recebido');
