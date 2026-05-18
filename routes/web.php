@@ -73,8 +73,8 @@ Route::middleware('auth')->group(function () {
     Route::post('contas-pagar/atualizar-data-massa', [ContasPagarController::class, 'atualizarDataMassa'])->name('contas-pagar.atualizar-data-massa');
     Route::post('contas-pagar/{contaPagar}/baixar', [ContasPagarController::class, 'baixar'])->name('contas-pagar.baixar');
     Route::post('contas-pagar/{contaPagar}/cancelar-baixa', [ContasPagarController::class, 'cancelarBaixa'])->name('contas-pagar.cancelar-baixa');
-    Route::get('contas-pagar/{contaPagar}', [ContasPagarController::class, 'show'])->name('contas-pagar.show');
     Route::resource('contas-pagar', ContasPagarController::class)->names('contas-pagar')->except(['show']);
+    Route::get('contas-pagar/{contaPagar}', [ContasPagarController::class, 'show'])->name('contas-pagar.show');
 
     Route::get('contas-receber/deletados', [ContasReceberController::class, 'deletados'])->name('contas-receber.deletados');
     Route::post('contas-receber/{id}/restore', [ContasReceberController::class, 'restore'])->name('contas-receber.restore');
@@ -83,8 +83,8 @@ Route::middleware('auth')->group(function () {
     Route::post('contas-receber/atualizar-data-massa', [ContasReceberController::class, 'atualizarDataMassa'])->name('contas-receber.atualizar-data-massa');
     Route::post('contas-receber/{contaReceber}/baixar', [ContasReceberController::class, 'baixar'])->name('contas-receber.baixar');
     Route::post('contas-receber/{contaReceber}/cancelar-baixa', [ContasReceberController::class, 'cancelarBaixa'])->name('contas-receber.cancelar-baixa');
-    Route::get('contas-receber/{contaReceber}', [ContasReceberController::class, 'show'])->name('contas-receber.show');
     Route::resource('contas-receber', ContasReceberController::class)->names('contas-receber')->except(['show']);
+    Route::get('contas-receber/{contaReceber}', [ContasReceberController::class, 'show'])->name('contas-receber.show');
 
     // Boletos
     Route::resource('boletos', BoletoController::class)->except(['edit', 'update'])->names('boletos');
