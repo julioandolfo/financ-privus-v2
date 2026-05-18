@@ -8,7 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('contas_bancarias', function (Blueprint $table) {
+        if (!\Schema::hasTable('contas_bancarias')) {
+            Schema::create('contas_bancarias', function (Blueprint $table) {
             $table->id();
             $table->foreignId('empresa_id')->constrained()->cascadeOnDelete();
             $table->string('nome');
@@ -22,6 +23,7 @@ return new class extends Migration
             $table->boolean('ativo')->default(true);
             $table->timestamps();
         });
+        }
     }
 
     public function down(): void

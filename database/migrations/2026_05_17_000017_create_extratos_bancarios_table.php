@@ -8,7 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('extratos_bancarios', function (Blueprint $table) {
+        if (!\Schema::hasTable('extratos_bancarios')) {
+            Schema::create('extratos_bancarios', function (Blueprint $table) {
             $table->id();
             $table->foreignId('empresa_id')->constrained('empresas')->cascadeOnDelete();
             $table->foreignId('conta_bancaria_id')->constrained('contas_bancarias');
@@ -20,8 +21,10 @@ return new class extends Migration
 
             $table->index(['empresa_id', 'conta_bancaria_id']);
         });
+        }
 
-        Schema::create('extratos_lancamentos', function (Blueprint $table) {
+        if (!\Schema::hasTable('extratos_lancamentos')) {
+            Schema::create('extratos_lancamentos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('extrato_id')->constrained('extratos_bancarios')->cascadeOnDelete();
             $table->string('fitid', 100)->nullable();
@@ -36,6 +39,7 @@ return new class extends Migration
 
             $table->index(['extrato_id', 'conciliado', 'ignorado']);
         });
+        }
     }
 
     public function down(): void

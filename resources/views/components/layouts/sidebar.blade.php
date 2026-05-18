@@ -186,6 +186,16 @@
             Inadimplência
         </x-layouts.nav-item>
 
+        <x-layouts.nav-item href="{{ route('relatorios.margem') }}" :active="request()->routeIs('relatorios.margem')">
+            <x-slot:icon><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" /></svg></x-slot:icon>
+            Margem / Lucro
+        </x-layouts.nav-item>
+
+        <x-layouts.nav-item href="{{ route('relatorios.estoque') }}" :active="request()->routeIs('relatorios.estoque')">
+            <x-slot:icon><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /></svg></x-slot:icon>
+            Estoque
+        </x-layouts.nav-item>
+
         <x-layouts.nav-item href="{{ route('perfis-consolidacao.index') }}" :active="request()->routeIs('perfis-consolidacao.*')">
             <x-slot:icon><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 3.75 9v.75m16.5-2.872A2.25 2.25 0 0 1 20.25 9v.75m0 0a2.25 2.25 0 0 1-1.5 2.122M3.75 9.75a2.25 2.25 0 0 0 1.5 2.122m0 0V20.25M5.25 11.872V20.25m0 0h13.5m-13.5 0c-.621 0-1.125-.504-1.125-1.125V11.872m15.375 8.253c.621 0 1.125-.504 1.125-1.125V11.872" /></svg></x-slot:icon>
             Perfis de Consolidação

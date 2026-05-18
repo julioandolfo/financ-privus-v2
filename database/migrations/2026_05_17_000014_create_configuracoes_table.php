@@ -8,7 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('configuracoes', function (Blueprint $table) {
+        if (!\Schema::hasTable('configuracoes')) {
+            Schema::create('configuracoes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('empresa_id')->nullable()->constrained('empresas')->nullOnDelete();
             $table->string('chave', 100);
@@ -18,6 +19,7 @@ return new class extends Migration
 
             $table->unique(['empresa_id', 'chave']);
         });
+        }
     }
 
     public function down(): void

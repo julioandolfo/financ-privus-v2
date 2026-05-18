@@ -8,15 +8,18 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('categorias_produto', function (Blueprint $table) {
+        if (!\Schema::hasTable('categorias_produto')) {
+            Schema::create('categorias_produto', function (Blueprint $table) {
             $table->id();
             $table->foreignId('empresa_id')->constrained('empresas')->cascadeOnDelete();
             $table->string('nome');
             $table->boolean('ativo')->default(true);
             $table->timestamps();
         });
+        }
 
-        Schema::create('produtos', function (Blueprint $table) {
+        if (!\Schema::hasTable('produtos')) {
+            Schema::create('produtos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('empresa_id')->constrained('empresas')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users');
@@ -56,6 +59,7 @@ return new class extends Migration
             $table->unique(['empresa_id', 'codigo']);
             $table->index(['empresa_id', 'ativo']);
         });
+        }
     }
 
     public function down(): void

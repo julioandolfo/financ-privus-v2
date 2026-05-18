@@ -50,17 +50,51 @@
         </form>
     </x-ui.card>
 
-    <x-ui.card :padding="false" x-data="{ selected: [], all: false }">
+    <x-ui.card :padding="false" x-data="{ selected: [], all: false, acaoMassa: 'baixa' }">
 
-        <div x-show="selected.length > 0" x-cloak class="flex items-center gap-3 px-5 py-3 bg-green-50 dark:bg-green-900/20 border-b border-green-100 dark:border-green-800">
+        <div x-show="selected.length > 0" x-cloak class="flex flex-wrap items-center gap-3 px-5 py-3 bg-green-50 dark:bg-green-900/20 border-b border-green-100 dark:border-green-800">
             <span class="text-sm font-medium text-green-700 dark:text-green-300" x-text="selected.length + ' selecionado(s)'"></span>
-            <form method="POST" action="{{ route('contas-receber.baixa-massa') }}" class="flex items-center gap-2">
+
+            {{-- Ação selector --}}
+            <select x-model="acaoMassa" class="rounded-lg border border-surface-300 dark:border-surface-600 bg-white dark:bg-surface-800 text-xs px-2 py-1.5 text-surface-700 dark:text-surface-200 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                <option value="baixa">Baixar</option>
+                <option value="categoria">Atualizar Categoria</option>
+                <option value="data">Atualizar Data de Vencimento</option>
+            </select>
+
+            {{-- Baixa em massa --}}
+            <form x-show="acaoMassa === 'baixa'" method="POST" action="{{ route('contas-receber.baixa-massa') }}" class="flex items-center gap-2">
                 @csrf
                 <template x-for="id in selected" :key="id">
                     <input type="hidden" name="ids[]" :value="id">
                 </template>
                 <x-ui.input type="date" name="data_recebimento" required class="py-1.5 text-xs w-36" />
                 <x-ui.button type="submit" size="sm" variant="primary">Baixar Selecionados</x-ui.button>
+            </form>
+
+            {{-- Atualizar categoria em massa --}}
+            <form x-show="acaoMassa === 'categoria'" method="POST" action="{{ route('contas-receber.atualizar-categoria-massa') }}" class="flex items-center gap-2">
+                @csrf
+                <template x-for="id in selected" :key="id">
+                    <input type="hidden" name="ids[]" :value="id">
+                </template>
+                <select name="categoria_id" required class="rounded-lg border border-surface-300 dark:border-surface-600 bg-white dark:bg-surface-800 text-xs px-2 py-1.5 text-surface-700 dark:text-surface-200 focus:outline-none focus:ring-2 focus:ring-primary-500 w-48">
+                    <option value="">Selecione a categoria...</option>
+                    @foreach(\App\Models\CategoriaFinanceira::where('empresa_id', auth()->user()->empresa_id)->orderBy('nome')->get() as $cat)
+                    <option value="{{ $cat->id }}">{{ $cat->nome }}</option>
+                    @endforeach
+                </select>
+                <x-ui.button type="submit" size="sm" variant="primary">Atualizar Categoria</x-ui.button>
+            </form>
+
+            {{-- Atualizar data de vencimento em massa --}}
+            <form x-show="acaoMassa === 'data'" method="POST" action="{{ route('contas-receber.atualizar-data-massa') }}" class="flex items-center gap-2">
+                @csrf
+                <template x-for="id in selected" :key="id">
+                    <input type="hidden" name="ids[]" :value="id">
+                </template>
+                <x-ui.input type="date" name="data_vencimento" required class="py-1.5 text-xs w-36" />
+                <x-ui.button type="submit" size="sm" variant="primary">Atualizar Data</x-ui.button>
             </form>
         </div>
 

@@ -8,7 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('notificacoes', function (Blueprint $table) {
+        if (!\Schema::hasTable('notificacoes')) {
+            Schema::create('notificacoes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('empresa_id')->constrained('empresas')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
@@ -25,6 +26,7 @@ return new class extends Migration
             $table->index(['empresa_id', 'user_id', 'lida']);
             $table->index(['user_id', 'created_at']);
         });
+        }
     }
 
     public function down(): void

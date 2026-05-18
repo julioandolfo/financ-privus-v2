@@ -8,7 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('nfes', function (Blueprint $table) {
+        if (!\Schema::hasTable('nfes')) {
+            Schema::create('nfes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('empresa_id')->constrained('empresas')->cascadeOnDelete();
             $table->foreignId('pedido_id')->nullable()->constrained('pedidos_vinculados')->nullOnDelete();
@@ -38,6 +39,7 @@ return new class extends Migration
             $table->index(['empresa_id', 'data_emissao']);
             $table->index(['empresa_id', 'cliente_id']);
         });
+        }
     }
 
     public function down(): void

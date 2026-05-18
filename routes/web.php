@@ -34,6 +34,8 @@ use App\Http\Controllers\TransacaoPendenteController;
 use App\Http\Controllers\WhatsAppController;
 use App\Http\Controllers\InadimplenciaController;
 use App\Http\Controllers\DfcController;
+use App\Http\Controllers\MargemController;
+use App\Http\Controllers\EstoqueController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn() => redirect()->route('dashboard'));
@@ -67,6 +69,8 @@ Route::middleware('auth')->group(function () {
     Route::get('contas-pagar/deletados', [ContasPagarController::class, 'deletados'])->name('contas-pagar.deletados');
     Route::post('contas-pagar/{id}/restore', [ContasPagarController::class, 'restore'])->name('contas-pagar.restore');
     Route::post('contas-pagar/baixa-massa', [ContasPagarController::class, 'baixaMassa'])->name('contas-pagar.baixa-massa');
+    Route::post('contas-pagar/atualizar-categoria-massa', [ContasPagarController::class, 'atualizarCategoriaMassa'])->name('contas-pagar.atualizar-categoria-massa');
+    Route::post('contas-pagar/atualizar-data-massa', [ContasPagarController::class, 'atualizarDataMassa'])->name('contas-pagar.atualizar-data-massa');
     Route::post('contas-pagar/{contaPagar}/baixar', [ContasPagarController::class, 'baixar'])->name('contas-pagar.baixar');
     Route::post('contas-pagar/{contaPagar}/cancelar-baixa', [ContasPagarController::class, 'cancelarBaixa'])->name('contas-pagar.cancelar-baixa');
     Route::get('contas-pagar/{contaPagar}', [ContasPagarController::class, 'show'])->name('contas-pagar.show');
@@ -75,6 +79,8 @@ Route::middleware('auth')->group(function () {
     Route::get('contas-receber/deletados', [ContasReceberController::class, 'deletados'])->name('contas-receber.deletados');
     Route::post('contas-receber/{id}/restore', [ContasReceberController::class, 'restore'])->name('contas-receber.restore');
     Route::post('contas-receber/baixa-massa', [ContasReceberController::class, 'baixaMassa'])->name('contas-receber.baixa-massa');
+    Route::post('contas-receber/atualizar-categoria-massa', [ContasReceberController::class, 'atualizarCategoriaMassa'])->name('contas-receber.atualizar-categoria-massa');
+    Route::post('contas-receber/atualizar-data-massa', [ContasReceberController::class, 'atualizarDataMassa'])->name('contas-receber.atualizar-data-massa');
     Route::post('contas-receber/{contaReceber}/baixar', [ContasReceberController::class, 'baixar'])->name('contas-receber.baixar');
     Route::post('contas-receber/{contaReceber}/cancelar-baixa', [ContasReceberController::class, 'cancelarBaixa'])->name('contas-receber.cancelar-baixa');
     Route::get('contas-receber/{contaReceber}', [ContasReceberController::class, 'show'])->name('contas-receber.show');
@@ -155,6 +161,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/relatorios/inadimplencia/pdf', [InadimplenciaController::class, 'pdf'])->name('relatorios.inadimplencia.pdf');
     Route::get('/relatorios/dfc', [DfcController::class, 'index'])->name('relatorios.dfc');
     Route::get('/relatorios/dfc/pdf', [DfcController::class, 'pdf'])->name('relatorios.dfc.pdf');
+    Route::get('/relatorios/margem', [MargemController::class, 'index'])->name('relatorios.margem');
+    Route::get('/relatorios/margem/pdf', [MargemController::class, 'pdf'])->name('relatorios.margem.pdf');
+    Route::get('/relatorios/estoque', [EstoqueController::class, 'index'])->name('relatorios.estoque');
+    Route::get('/relatorios/estoque/pdf', [EstoqueController::class, 'pdf'])->name('relatorios.estoque.pdf');
 
     Route::resource('despesas-recorrentes', DespesaRecorrenteController::class)->names('despesas-recorrentes')->except(['show']);
     Route::post('despesas-recorrentes/{despesasRecorrente}/toggle', [DespesaRecorrenteController::class, 'toggle'])->name('despesas-recorrentes.toggle');

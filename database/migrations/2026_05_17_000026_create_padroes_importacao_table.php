@@ -8,7 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('padroes_importacao_extrato', function (Blueprint $table) {
+        if (!\Schema::hasTable('padroes_importacao_extrato')) {
+            Schema::create('padroes_importacao_extrato', function (Blueprint $table) {
             $table->id();
             $table->foreignId('empresa_id')->constrained('empresas')->cascadeOnDelete();
             $table->string('descricao_contem', 255);
@@ -20,6 +21,7 @@ return new class extends Migration
             $table->boolean('ativo')->default(true);
             $table->timestamps();
         });
+        }
     }
 
     public function down(): void

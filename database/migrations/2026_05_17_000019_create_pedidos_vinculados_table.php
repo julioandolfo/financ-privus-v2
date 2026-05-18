@@ -8,7 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('pedidos_vinculados', function (Blueprint $table) {
+        if (!\Schema::hasTable('pedidos_vinculados')) {
+            Schema::create('pedidos_vinculados', function (Blueprint $table) {
             $table->id();
             $table->foreignId('empresa_id')->constrained('empresas')->cascadeOnDelete();
             $table->foreignId('cliente_id')->nullable()->constrained('clientes')->nullOnDelete();
@@ -36,8 +37,10 @@ return new class extends Migration
             $table->index(['empresa_id', 'cliente_id']);
             $table->index(['origem', 'origem_id']);
         });
+        }
 
-        Schema::create('pedidos_itens', function (Blueprint $table) {
+        if (!\Schema::hasTable('pedidos_itens')) {
+            Schema::create('pedidos_itens', function (Blueprint $table) {
             $table->id();
             $table->foreignId('pedido_id')->constrained('pedidos_vinculados')->cascadeOnDelete();
             $table->foreignId('produto_id')->nullable()->constrained('produtos')->nullOnDelete();
@@ -56,6 +59,7 @@ return new class extends Migration
             $table->index('pedido_id');
             $table->index('produto_id');
         });
+        }
     }
 
     public function down(): void

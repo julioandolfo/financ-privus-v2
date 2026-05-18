@@ -8,7 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('evolution_configs', function (Blueprint $table) {
+        if (!\Schema::hasTable('evolution_configs')) {
+            Schema::create('evolution_configs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('empresa_id')->nullable()->constrained('empresas')->nullOnDelete();
             $table->string('nome', 100);
@@ -22,8 +23,10 @@ return new class extends Migration
 
             $table->index(['empresa_id', 'ativo']);
         });
+        }
 
-        Schema::create('whatsapp_regras', function (Blueprint $table) {
+        if (!\Schema::hasTable('whatsapp_regras')) {
+            Schema::create('whatsapp_regras', function (Blueprint $table) {
             $table->id();
             $table->foreignId('empresa_id')->constrained('empresas')->cascadeOnDelete();
             $table->foreignId('evolution_config_id')->nullable()->constrained('evolution_configs')->nullOnDelete();
@@ -40,8 +43,10 @@ return new class extends Migration
             $table->index(['empresa_id', 'ativo']);
             $table->index(['empresa_id', 'tipo']);
         });
+        }
 
-        Schema::create('whatsapp_destinatarios', function (Blueprint $table) {
+        if (!\Schema::hasTable('whatsapp_destinatarios')) {
+            Schema::create('whatsapp_destinatarios', function (Blueprint $table) {
             $table->id();
             $table->foreignId('regra_id')->constrained('whatsapp_regras')->cascadeOnDelete();
             $table->string('nome', 100);
@@ -50,6 +55,7 @@ return new class extends Migration
 
             $table->index('regra_id');
         });
+        }
     }
 
     public function down(): void

@@ -8,7 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('empresas', function (Blueprint $table) {
+        if (!\Schema::hasTable('empresas')) {
+            Schema::create('empresas', function (Blueprint $table) {
             $table->id();
             $table->string('codigo', 20)->unique();
             $table->string('razao_social');
@@ -20,6 +21,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
         });
+        }
     }
 
     public function down(): void

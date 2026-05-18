@@ -226,6 +226,41 @@ class ContasPagarController extends Controller
         return redirect()->route('contas-pagar.deletados')->with('success', 'Conta restaurada com sucesso.');
     }
 
+    public function atualizarCategoriaMassa(Request $request)
+    {
+        $request->validate([
+            'ids'          => 'required|array',
+            'ids.*'        => 'integer',
+            'categoria_id' => 'required|exists:categorias_financeiras,id',
+        ]);
+
+        $empresaId = auth()->user()->empresa_id;
+
+        ContaPagar::whereIn('id', $request->ids)
+            ->where('empresa_id', $empresaId)
+            ->update(['categoria_id' => $request->categoria_id]);
+
+        return redirect()->route('contas-pagar.index')->with('success', 'Categoria atualizada em massa.');
+    }
+
+    public function atualizarDataMassa(Request $request)
+    {
+        $request->validate([
+            'ids'              => 'required|array',
+            'ids.*'            => 'integer',
+            'data_vencimento'  => 'required|date',
+        ]);
+
+        $empresaId = auth()->user()->empresa_id;
+
+        ContaPagar::whereIn('id', $request->ids)
+            ->where('empresa_id', $empresaId)
+            ->whereIn('status', ['pendente', 'vencido'])
+            ->update(['data_vencimento' => $request->data_vencimento]);
+
+        return redirect()->route('contas-pagar.index')->with('success', 'Data de vencimento atualizada em massa.');
+    }
+
     private function authorizeEmpresa(ContaPagar $conta): void
     {
         abort_if($conta->empresa_id !== auth()->user()->empresa_id, 403);

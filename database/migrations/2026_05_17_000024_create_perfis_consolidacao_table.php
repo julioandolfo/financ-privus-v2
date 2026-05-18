@@ -8,7 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('perfis_consolidacao', function (Blueprint $table) {
+        if (!\Schema::hasTable('perfis_consolidacao')) {
+            Schema::create('perfis_consolidacao', function (Blueprint $table) {
             $table->id();
             $table->foreignId('empresa_id')->constrained('empresas')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
@@ -19,6 +20,7 @@ return new class extends Migration
             $table->boolean('ativo')->default(true);
             $table->timestamps();
         });
+        }
     }
 
     public function down(): void

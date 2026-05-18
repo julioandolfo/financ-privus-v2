@@ -8,7 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('integracoes_config', function (Blueprint $table) {
+        if (!\Schema::hasTable('integracoes_config')) {
+            Schema::create('integracoes_config', function (Blueprint $table) {
             $table->id();
             $table->foreignId('empresa_id')->constrained('empresas')->cascadeOnDelete();
             $table->string('tipo', 50); // woocommerce, whatsapp, boleto, nfe, banco_openbanking
@@ -22,8 +23,10 @@ return new class extends Migration
 
             $table->unique(['empresa_id', 'tipo']);
         });
+        }
 
-        Schema::create('integracoes_logs', function (Blueprint $table) {
+        if (!\Schema::hasTable('integracoes_logs')) {
+            Schema::create('integracoes_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('empresa_id')->constrained('empresas')->cascadeOnDelete();
             $table->string('tipo', 50);
@@ -34,6 +37,7 @@ return new class extends Migration
 
             $table->index(['empresa_id', 'tipo', 'created_at']);
         });
+        }
     }
 
     public function down(): void

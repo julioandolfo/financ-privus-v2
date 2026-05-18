@@ -8,7 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('formas_pagamento', function (Blueprint $table) {
+        if (!\Schema::hasTable('formas_pagamento')) {
+            Schema::create('formas_pagamento', function (Blueprint $table) {
             $table->id();
             $table->foreignId('empresa_id')->nullable()->constrained()->nullOnDelete();
             $table->string('codigo', 20)->nullable();
@@ -18,6 +19,7 @@ return new class extends Migration
             $table->boolean('ativo')->default(true);
             $table->timestamps();
         });
+        }
     }
 
     public function down(): void

@@ -8,7 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('contas_pagar', function (Blueprint $table) {
+        if (!\Schema::hasTable('contas_pagar')) {
+            Schema::create('contas_pagar', function (Blueprint $table) {
             $table->id();
             $table->foreignId('empresa_id')->constrained()->cascadeOnDelete();
             $table->foreignId('fornecedor_id')->nullable()->constrained('fornecedores')->nullOnDelete();
@@ -36,6 +37,7 @@ return new class extends Migration
 
             $table->index(['empresa_id', 'status', 'data_vencimento']);
         });
+        }
     }
 
     public function down(): void

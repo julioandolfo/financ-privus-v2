@@ -8,7 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('parcelas_receber', function (Blueprint $table) {
+        if (!\Schema::hasTable('parcelas_receber')) {
+            Schema::create('parcelas_receber', function (Blueprint $table) {
             $table->id();
             $table->foreignId('conta_receber_id')->constrained()->cascadeOnDelete();
             $table->integer('numero_parcela');
@@ -25,6 +26,7 @@ return new class extends Migration
             $table->text('observacoes')->nullable();
             $table->timestamps();
         });
+        }
     }
 
     public function down(): void

@@ -8,7 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('despesas_recorrentes', function (Blueprint $table) {
+        if (!\Schema::hasTable('despesas_recorrentes')) {
+            Schema::create('despesas_recorrentes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('empresa_id')->constrained('empresas');
             $table->foreignId('user_id')->constrained('users');
@@ -38,8 +39,10 @@ return new class extends Migration
             $table->text('observacoes')->nullable();
             $table->timestamps();
         });
+        }
 
-        Schema::create('receitas_recorrentes', function (Blueprint $table) {
+        if (!\Schema::hasTable('receitas_recorrentes')) {
+            Schema::create('receitas_recorrentes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('empresa_id')->constrained('empresas');
             $table->foreignId('user_id')->constrained('users');
@@ -69,6 +72,7 @@ return new class extends Migration
             $table->text('observacoes')->nullable();
             $table->timestamps();
         });
+        }
 
         // Link contas geradas de volta à recorrência
         Schema::table('contas_pagar', function (Blueprint $table) {

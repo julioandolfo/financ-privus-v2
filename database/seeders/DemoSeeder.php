@@ -26,6 +26,7 @@ class DemoSeeder extends Seeder
             [
                 'razao_social'  => 'Empresa Demo Ltda',
                 'nome_fantasia' => 'Demo Financeiro',
+                'codigo'        => 'DEMO',
                 'ativo'         => true,
             ]
         );

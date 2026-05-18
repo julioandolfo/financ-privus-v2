@@ -8,7 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('categorias_financeiras', function (Blueprint $table) {
+        if (!\Schema::hasTable('categorias_financeiras')) {
+            Schema::create('categorias_financeiras', function (Blueprint $table) {
             $table->id();
             $table->foreignId('empresa_id')->constrained()->cascadeOnDelete();
             $table->string('codigo', 20)->nullable();
@@ -18,6 +19,7 @@ return new class extends Migration
             $table->boolean('ativo')->default(true);
             $table->timestamps();
         });
+        }
     }
 
     public function down(): void

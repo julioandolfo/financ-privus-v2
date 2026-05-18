@@ -8,7 +8,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('produto_variacoes', function (Blueprint $table) {
+        if (!\Schema::hasTable('produto_variacoes')) {
+            Schema::create('produto_variacoes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('produto_id')->constrained('produtos')->cascadeOnDelete();
             $table->string('atributo', 50);
@@ -20,8 +21,10 @@ return new class extends Migration
             $table->boolean('ativo')->default(true);
             $table->timestamps();
         });
+        }
 
-        Schema::create('produto_fotos', function (Blueprint $table) {
+        if (!\Schema::hasTable('produto_fotos')) {
+            Schema::create('produto_fotos', function (Blueprint $table) {
             $table->id();
             $table->foreignId('produto_id')->constrained('produtos')->cascadeOnDelete();
             $table->string('path', 500);
@@ -30,6 +33,7 @@ return new class extends Migration
             $table->tinyInteger('ordem')->default(0);
             $table->timestamps();
         });
+        }
     }
 
     public function down(): void
